@@ -1,0 +1,71 @@
+.navbar {
+    background: transparent; /* Torna a navbar transparente */
+    backdrop-filter: blur(10px); /* Aplica um leve desfoque para melhor visibilidade */
+    padding: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100vw;
+    height: 46px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+.navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 1200px;
+    padding: 1 3rem; /* Ajuste para não empurrar a logo */
+}
+
+.navbar-logo {
+    padding-top: 13px;
+}
+.navbar-logo img {
+    height: 38px;
+    width: 68px;
+    padding-left: 20px;
+}
+
+.navbar-menu {
+    display: flex;
+    list-style: none;
+    gap: 1.5rem;
+    margin-left: 95%; /* Alinha os itens do menu à direita */
+}
+
+.navbar-link {
+    color: white;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.navbar-link:hover {
+    color: #d1e8ff;
+}
+
+.navbar-button {
+    background: white;
+    color: #1e3a8a;
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.navbar-button:hover {
+    background: #d1e8ff;
+}
+
+/* Ajuste para garantir que o conteúdo abaixo da navbar não fique escondido */
+.container {
+    padding-top: 70px; /* Evita que a navbar sobreponha o conteúdo */
+}
