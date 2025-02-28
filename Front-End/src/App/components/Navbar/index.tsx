@@ -25,3 +25,5 @@ export function Navbar() {
     </main>
   );
 }
+
+export default Navbar

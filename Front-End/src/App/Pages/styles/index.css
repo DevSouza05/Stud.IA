@@ -28,7 +28,7 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  color: #f6f1f1;
+  color: #6e1bdb;
 }
 
 h1 {
@@ -74,3 +74,94 @@ h1{
 #algumacoisa{
   color: #1a1a1a;
 }
+
+/* pagina home */
+
+.home-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+
+.card {
+  background-color: #fff;
+  padding: 20px;
+  margin: 20px 0;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+
+.roadmap-etapa {
+  margin-bottom: 15px;
+}
+
+.progress-bar {
+  background-color: #ddd;
+  border-radius: 10px;
+  height: 20px;
+  width: 100%;
+}
+
+.progress-bar span {
+  display: block;
+  height: 100%;
+  border-radius: 10px;
+  background-color: #4CAF50;
+}
+
+
+.conquista-list {
+  list-style: none;
+  padding: 0;
+}
+
+.conquista-list li {
+  background-color: #e3e3e3;
+  margin: 8px 0;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+
+.recommendation-list {
+  list-style: none;
+  padding: 0;
+}
+
+.recommendation-list li {
+  background-color: #f4f4f9;
+  padding: 12px;
+  margin: 10px 0;
+  border-left: 5px solid #4CAF50;
+  border-radius: 8px;
+  transition: transform 0.3s ease;
+}
+
+.recommendation-list li:hover {
+  transform: translateX(10px);
+}
+
+
+.error-message {
+  color: red;
+  font-weight: bold;
+  text-align: center;
+}
+
+.loading-message {
+  text-align: center;
+  color: #888;
+}
+

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import RoadmapProgress from '../../components/RoadmapProgress/RoadmapProgress';
 import "../styles/index.css";
-
+import Navbar from '../../components/Navbar/index';
 
 export const TelaInicial = () => {
   const location = useLocation();
@@ -33,25 +34,66 @@ export const TelaInicial = () => {
     fetchRoadmap();
   }, []);
 
+  // Organizar os dados do roadmap 
+  const organizeRoadmapData = (data) => {
+    if (!data) return { etapas: [], conquistas: [], recomendacoes: [] };
+
+    return {
+      etapas: data.etapas || [],
+      conquistas: data.conquistas || [],
+      recomendacoes: data.recomendacoes || [],
+    };
+  };
+
+  const organizedRoadmap = organizeRoadmapData(roadmap);
+
   return (
     <div>
-      <h1>Tela Inicial</h1>
-      {dados && (
-        <div id='dados-recebidos'>
-          <h2 >Dados recebidos:</h2>
-          <pre id="pre">{JSON.stringify(dados, null, 2)}</pre>
+      <div className="home-container">
+        <div className="main-content">
+          <Navbar />
+          <h1>Bem-vindo!</h1>
+
+          {/*Roadmap */}
+          <div className="card">
+            <h2>Visão Geral do Roadmap</h2>
+            {organizedRoadmap.etapas.map((etapa) => (
+              <div key={etapa.id} className="roadmap-etapa">
+                <h3>{etapa.nome}</h3>
+                <RoadmapProgress progress={etapa.progresso} />
+              </div>
+            ))}
+          </div>
+
+          {/*Conquistas */}
+          {organizedRoadmap.conquistas.length > 0 && (
+            <div className="card">
+              <h2>Conquistas</h2>
+              <ul className="conquista-list">
+                {organizedRoadmap.conquistas.map((conquista) => (
+                  <li key={conquista.id}>{conquista.nome}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Recomendações */}
+          {organizedRoadmap.recomendacoes.length > 0 && (
+            <div className="card">
+              <h2>Recomendações</h2>
+              <ul className="recommendation-list">
+                {organizedRoadmap.recomendacoes.map((recomendacao) => (
+                  <li key={recomendacao.id}>{recomendacao.nome}</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
-      )}
-      {error ? (
-        <p style={{ color: 'red' }}>{error}</p>
-      ) : roadmap ? (
-        <div id="algumacoisa">
-          <h2>Roadmap</h2>
-          <pre>{JSON.stringify(roadmap, null, 2)}</pre>
-        </div>
-      ) : (
-        <p>Carregando roadmap...</p>
-      )}
+      </div>
+
+   
+      {error && <p className="error-message">{error}</p>}
+      {!roadmap && !error && <p className="loading-message">Carregando roadmap...</p>}
     </div>
   );
 };
