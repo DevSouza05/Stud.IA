@@ -35,7 +35,7 @@
     display: flex;
     list-style: none;
     gap: 1.5rem;
-    margin-left: 95%; /* Alinha os itens do menu à direita */
+    margin-left: 132%; /* Alinha os itens do menu à direita */
 }
 
 .navbar-link {

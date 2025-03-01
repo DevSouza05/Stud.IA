@@ -79,7 +79,7 @@ public class roadmapController {
         }
 
 
-        String roadmapSalvo = selecao.getRoadmapGerado();
+        String roadmapSalvo = selecao.getRoadmap();
         if (roadmapSalvo != null){
             return Mono.just(ResponseEntity.ok(Map.of("roadmap", roadmapSalvo)));
         }

@@ -93,8 +93,9 @@ public class Selecao {
         }
     }
 
-    public String getRoadmapGerado() {
+    public String getRoadmap() {
         return roadmap;
+
     }
 
     public void setRoadmapGerado(String roadmapGerado) {

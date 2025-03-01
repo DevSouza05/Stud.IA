@@ -1,0 +1,90 @@
+.home-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f0f2f5;
+  padding: 20px;
+}
+
+.main-content {
+  width: 100%;
+  max-width: 900px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
+
+.error-message {
+  color: #d32f2f;
+  font-weight: bold;
+  text-align: center;
+}
+
+.loading-message {
+  color: #1976d2;
+  text-align: center;
+}
+
+.roadmap-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.roadmap-item {
+  background: #fafafa;
+  padding: 15px;
+  border-radius: 5px;
+  border: 1px solid #e0e0e0;
+}
+
+.roadmap-item h3 {
+  color: #1976d2;
+  margin-bottom: 15px;
+}
+
+.section {
+  margin-bottom: 15px;
+}
+
+.section h4 {
+  color: #333;
+  margin-bottom: 5px;
+  font-size: 1.1em;
+}
+
+.section ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.section ul li {
+  padding: 5px 0;
+  color: #555;
+}
+
+.section p {
+  color: #555;
+  margin: 0;
+}
+
+.difficulty-item {
+  background: #f5f5f5;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+.difficulty-item p {
+  margin: 5px 0;
+}
+
+.difficulty-item strong {
+  color: #333;
+}

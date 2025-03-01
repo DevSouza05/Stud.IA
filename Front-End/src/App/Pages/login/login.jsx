@@ -1,7 +1,6 @@
 import "../styles/global.css";
 import arrow from "../../assets/arrow.svg";
 import { Navbar } from "../../components/Navbar/index.tsx";
-
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
@@ -11,6 +10,7 @@ export function App() {
     senha: "",
   });
 
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   function handleChange(event) {
@@ -40,48 +40,47 @@ export function App() {
       return;
     }
 
+    setLoading(true);
+
     try {
       const response = await fetch("http://localhost:8080/api/v1/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          email: formData.email,
-          senha: formData.senha,
-        }),
+        body: JSON.stringify(formData),
       });
 
       const responseData = await response.json();
 
-      if (responseData && responseData.userID) {
-        localStorage.setItem("userId", responseData.userID);
-    }
-      
+      console.log("🟢 Resposta da API:", responseData);
+
       if (response.status === 200) {
         alert("Usuário autenticado com sucesso!");
-        console.log("response: " + JSON.stringify(responseData));
-        localStorage.clearItem("userId");
+        localStorage.setItem("userId", responseData.userID);
 
-        if (responseData.selecoes.length === 0) {
-          alert("Usuário ainda não criou seleções.");
-          navigate("/SwiperPage");
-        } else {
-          alert("Usuário já criou seleções.");
-          navigate("/home");
-        }
+        const hasSelecoes = responseData.selecoes?.length > 0;
+        const destino = hasSelecoes ? "/home" : "/SwiperPage";
+        const mensagem = hasSelecoes
+          ? "Usuário já criou seleções."
+          : "Usuário ainda não criou seleções.";
+
+        alert(mensagem);
+        navigate(destino, { state: { userId: responseData.userID } });
       } else {
-        alert(responseData.message || "Erro desconhecido. Tente novamente.");
+        alert(responseData?.message || "Erro desconhecido. Tente novamente.");
       }
     } catch (error) {
-      console.error("Erro ao autenticar usuário:", error);
+      console.error("🔴 Erro ao autenticar usuário:", error);
       alert("Erro ao autenticar usuário. Tente novamente.");
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
     <div className="container">
-      <Navbar></Navbar>
+      <Navbar />
       <header>
         <img src={"./logoStudIA.png"} alt="Logo Stud.Ia" />
         <span>Realize seu login</span>
@@ -116,14 +115,14 @@ export function App() {
 
         <a href="#">Esqueceu sua senha?</a>
 
-        <button className="button">
-          Entrar <img src={arrow} alt="Seta" />
+        <button className="button" disabled={loading}>
+          {loading ? "Entrando..." : "Entrar"}
+          {!loading && <img src={arrow} alt="Seta" />}
         </button>
 
         <div className="footer">
           <p>Ainda não tem uma conta?</p>
           <Link to="/cadastro">Criar uma conta</Link>
-          {/* <Link to="/SwiperPage">Ir para o Swiper</Link> */}
         </div>
       </form>
     </div>
