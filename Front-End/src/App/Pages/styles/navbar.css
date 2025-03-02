@@ -65,7 +65,49 @@
     background: #d1e8ff;
 }
 
-/* Ajuste para garantir que o conteúdo abaixo da navbar não fique escondido */
+
 .container {
-    padding-top: 70px; /* Evita que a navbar sobreponha o conteúdo */
+    padding-top: 70px;
+}
+.navbar.home {
+    background: transparent; 
+}
+
+
+.navbar.home .navbar-logo img {
+    height: 50px;
+    width: auto;
+}
+
+
+.navbar.home .navbar-menu {
+    margin-right: 2rem;
+}
+
+
+@media (max-width: 768px) {
+    .navbar.home {
+        height: 50px;
+        padding: 0.3rem 1rem;
+    }
+
+    .navbar.home .navbar-menu {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 50px;
+        right: 0;
+        background: rgba(0, 0, 0, 0.9);
+        width: 100%;
+        text-align: center;
+        padding: 1rem 0;
+    }
+
+    .navbar.home .navbar-menu.active {
+        display: flex;
+    }
+
+    .navbar.home .navbar-menu li {
+        padding: 0.8rem 0;
+    }
 }

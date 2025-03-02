@@ -14,6 +14,7 @@ export function SwiperPage() {
   const [dificuldadeEscolhida, setDificuldadeEscolhida] = useState(null);
   const [diasEscolhidos, setDiasEscolhidos] = useState([]);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [dificuldades, setDificuldades] = useState([]); 
   const navigate = useNavigate();
 
   const trilhas = [
@@ -24,22 +25,107 @@ export function SwiperPage() {
     "Redes",
     "Data Science",
     "Inteligencia artificial",
+    "Cybersecurity",
+    "Blockchain"
   ];
+  
   const senioridade = ["estudante", "junior", "sênior", "pleno"];
-  const dificuldades = [
-    "Entendimento de Requisitos",
-    "Integração de APIs",
-    "Otimização de Banco de Dados",
-    "Versionamento de Código",
-    "Segurança de Aplicações",
-    "Comunicação em Equipe",
-    "Resolução de Conflitos de Merge",
-    
-    
-    "Refatoração de Código Legado",
-  ];
+
+ 
+  const dificuldadesMap = {
+    Frontend: [
+      "Compreensão de HTML/CSS",
+      "Manipulação de DOM com JavaScript",
+      "Desenvolvimento com Frameworks (React, Vue, etc.)",
+      "Responsividade e Design Adaptativo",
+      "Integração com APIs REST",
+      "Controle de Estado (Redux, Context API)",
+      "Testes de Componentes e Funcionalidades",
+      "Performance e Otimização Frontend",
+      "Acessibilidade e Usabilidade",
+      "Web Performance e SEO",
+    ],
+    Backend: [
+      "Desenvolvimento de APIs RESTful",
+      "Gerenciamento de Banco de Dados (SQL/NoSQL)",
+      "Autenticação e Autorização",
+      "Microserviços e Arquitetura",
+      "Desempenho e Escalabilidade de Servidores",
+      "Testes de Backend (unitários, integração)",
+      "Segurança em Backend (CORS, JWT, etc.)",
+      "Gerenciamento de Logs e Monitoramento",
+      "Integração com Frontend e APIs de terceiros",
+      "Desenvolvimento de APIs GraphQL",
+    ],
+    DevOps: [
+      "Automação de Deploy com CI/CD",
+      "Gerenciamento de Containers (Docker, Kubernetes)",
+      "Infraestrutura como Código (Terraform, Ansible)",
+      "Monitoramento e Logs de Infraestrutura",
+      "Gerenciamento de Redes e Firewalls",
+      "Automação de Provisionamento de Servidores",
+      "Escalabilidade de Infraestrutura",
+      "Gerenciamento de Ambientes (Desenvolvimento, Produção)",
+      "Segurança e Gestão de Vulnerabilidades",
+      "Provisionamento e Gerenciamento de Cloud Providers",
+    ],
+    Infraestrutura: [
+      "Redes e Protocolos de Comunicação",
+      "Gerenciamento de Servidores e Datacenters",
+      "Arquitetura de Rede e Segurança",
+      "Backup e Recuperação de Dados",
+      "Gerenciamento de Firewalls e VPNs",
+      "Gerenciamento de Tráfego e Load Balancers",
+      "Configuração de Servidores Web (Apache, Nginx)",
+      "Infraestrutura em Nuvem (AWS, Azure, Google Cloud)",
+      "Segurança em Infraestrutura",
+      "Gerenciamento de Infraestrutura Híbrida (On-premise e Cloud)",
+    ],
+    Redes: [
+      "Fundamentos de Redes de Computadores",
+      "Protocolos de Rede (TCP/IP, HTTP, DNS)",
+      "Configuração de Roteadores e Switches",
+      "Segurança de Redes (Firewall, VPN)",
+      "Gerenciamento de Redes Locais (LAN, WLAN)",
+      "Redes Definidas por Software (SDN)",
+      "Configuração de Servidores de Rede",
+      "Gerenciamento de Endereçamento IP",
+      "Troubleshooting e Diagnóstico de Redes",
+      "Implementação de Redes de Alta Performance",
+    ],
+    "Data Science": [
+      "Análise Exploratória de Dados (EDA)",
+      "Estatísticas para Ciência de Dados",
+      "Pré-processamento e Limpeza de Dados",
+      "Modelos de Machine Learning Supervisionados",
+      "Redes Neurais e Deep Learning",
+      "Análise de Séries Temporais",
+      "Algoritmos de Recomendação",
+      "Avaliação e Validação de Modelos",
+      "Deploy de Modelos de Machine Learning",
+      "Data Engineering e Pipelines de Dados",
+    ],
+    "Inteligencia Artificial": [
+      "Fundamentos de Inteligência Artificial",
+      "Algoritmos de Aprendizado Supervisionado",
+      "Redes Neurais e Deep Learning",
+      "Visão Computacional",
+      "Processamento de Linguagem Natural (NLP)",
+      "Sistemas de Recomendação",
+      "Robótica e Automação",
+      "Planejamento e Busca em IA",
+      "Ética e Impacto da IA na Sociedade",
+      "Inteligência Artificial Explicável (XAI)",
+    ],
+  };
+  
+  
+
+  
   const handleTrilhaClick = (trilha) => {
     setTrilhaEscolhida(trilha);
+    setDificuldades(dificuldadesMap[trilha] || []);  
+    setDificuldadeEscolhida(null); 
     console.log("Trilha escolhida:", trilha);
   };
 
@@ -65,13 +151,13 @@ export function SwiperPage() {
     if (isSubmitted) return;
 
     const dadosResumo = {
-      userID: localStorage.getItem("userId"), 
+      userID: localStorage.getItem("userId"),
       selecoes: [
         trilhaEscolhida,
         senioridadeEscolhida,
         dificuldadeEscolhida,
         ...diasEscolhidos,
-      ].filter(Boolean), 
+      ].filter(Boolean),
     };
 
     console.log("Dados confirmados:", JSON.stringify(dadosResumo, null, 2));
@@ -101,7 +187,10 @@ export function SwiperPage() {
     }
   };
 
-  const todosCamposSelecionados = trilhaEscolhida && dificuldadeEscolhida && diasEscolhidos.length > 0;
+  const todosCamposSelecionados =
+    trilhaEscolhida &&
+    dificuldadeEscolhida &&
+    diasEscolhidos.length > 0;
 
   return (
     <div className="container">
@@ -252,9 +341,6 @@ export function SwiperPage() {
               <div className="botao-container">
                 <button className="botao-confirmar" onClick={handleConfirmar}>
                   {isSubmitted ? "Enviado!" : "Confirmar!"}
-                  
-                  
-                  
                 </button>
               </div>
             )}

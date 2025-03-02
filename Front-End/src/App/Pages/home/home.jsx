@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { data, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { Navbar } from "../../components/Navbar/index.tsx";
 
 import "../styles/home.css";
 
@@ -25,17 +26,13 @@ export const TelaInicial = () => {
           throw new Error(`Erro: ${response.status} - ${response.statusText}`);
         }
         const data = await response.json();
-        console.log("TESTETESTE: ", data)
         setUser(data.user.username);
-      }
-      catch (error) {
+      } catch (error) {
         setError(`Erro ao buscar o ID do usuário: ${error.message}`);
         console.error(error);
-  
-    }
-  };
-  fetchUserID(userId);
-
+      }
+    };
+    fetchUserID(userId);
 
     const fetchRoadmap = async () => {
       try {
@@ -45,9 +42,7 @@ export const TelaInicial = () => {
         }
 
         const data = await response.json();
-        console.log("Resposta da API:", data);
 
-       
         const cleanedRoadmap = data.roadmap
           .replace("```json", "") 
           .replace("```", "")     
@@ -69,18 +64,20 @@ export const TelaInicial = () => {
   return (
     <div className="home-container">
       <div className="main-content">
-      
-        <h1>Bem-vindo! </h1>
-        <br></br>
-        <h2>Olá, {user}! Seja bem-vindo ao Seu Guia de Aprendizado </h2>
+        <Navbar variant="home" />
+        <h1>Bem-vindo!</h1>
+        <br />
+        <h2>Olá, {user}! Seja bem-vindo ao Seu Guia de Aprendizado</h2>
 
         <div className="card">
           <h2>Visão Geral do Roadmap</h2>
 
           {error && <p className="error-message">{error}</p>}
-          {loading && <p className="loading-message">Carregando roadmap...</p>}
 
-          {roadmap && (
+          {loading ? (
+            <div className="loading-spinner"></div>
+          ) : (
+            
             <div className="roadmap-container">
               {roadmap.map((item, index) => (
                 <div key={index} className="roadmap-item">
