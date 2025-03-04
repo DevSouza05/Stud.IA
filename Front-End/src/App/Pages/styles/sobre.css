@@ -1,0 +1,34 @@
+.sobre-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    margin-top: 80px;
+  }
+  
+  header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  h1 {
+    font-size: 2.5rem;
+    color: white;
+  }
+  
+  .sobre-content {
+    padding: 20px;
+  }
+  
+  h2 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    color: white;
+  }
+  
+  p {
+    font-size: 1.1rem;
+    color: white;
+    line-height: 1.6;
+    margin-bottom: 15px;
+  }
+  
