@@ -24,7 +24,7 @@ export function SwiperPage() {
     "Infraestrutura",
     "Redes",
     "Data Science",
-    "Inteligencia artificial",
+    "Inteligencia Artificial",
     "Cybersecurity",
     "Blockchain"
   ];
@@ -117,7 +117,32 @@ export function SwiperPage() {
       "Ética e Impacto da IA na Sociedade",
       "Inteligência Artificial Explicável (XAI)",
     ],
+    "Blockchain": [
+      "Fundamentos de Blockchain e Descentralização",
+      "Criação e Deploy de Smart Contracts (Solidity, Rust)",
+      "Segurança em Smart Contracts e Auditoria de Código",
+      "Interação com Blockchain (Web3.js, ethers.js)",
+      "Criptografia e Assinaturas Digitais",
+      "Escalabilidade e Soluções Layer 2",
+      "Tokens e DeFi (ERC-20, NFTs, Liquidity Pools)",
+      "Interoperabilidade entre Blockchains",
+      "Governança em Blockchain e DAOs",
+      "Regulamentação e Conformidade em Blockchain",
+    ],
+    "Cybersecurity": [
+      "Fundamentos de Segurança da Informação",
+      "Criptografia e Protocolos de Segurança",
+      "Testes de Penetração e Ethical Hacking",
+      "Gerenciamento de Identidade e Acesso (IAM)",
+      "Segurança em Redes e Proteção contra Ataques",
+      "Forense Digital e Resposta a Incidentes",
+      "Segurança em Aplicações Web (OWASP Top 10)",
+      "Hardening de Sistemas e Servidores",
+      "Monitoramento e Análise de Logs de Segurança",
+      "Compliance e Normas de Segurança (ISO 27001, GDPR)",
+    ],
   };
+  
   
   
 

@@ -19,7 +19,7 @@
     align-items: center;
     width: 100%;
     max-width: 1200px;
-    padding: 1 3rem; /* Ajuste para não empurrar a logo */
+    /* padding: 1 3rem; Ajuste para não empurrar a logo */
 }
 
 .navbar-logo {
@@ -34,8 +34,8 @@
 .navbar-menu {
     display: flex;
     list-style: none;
-    gap: 1.5rem;
-    margin-left: 132%; /* Alinha os itens do menu à direita */
+    gap: 0.6rem;
+    margin-left: 129%; /* Alinha os itens do menu à direita */
 }
 
 .navbar-link {

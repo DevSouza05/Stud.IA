@@ -5,6 +5,8 @@ import axios from "axios";
 import "../styles/global.css";
 import arrow from "../../assets/arrow.svg"; 
 import { useNavigate } from "react-router-dom";
+import { Navbar } from "../../components/Navbar/index.tsx";
+
 // import ToggleButton from "../../components/toggleButton";
 
 
@@ -16,6 +18,8 @@ export function Cadastro() {
   });
 
   const navigate = useNavigate();
+  
+  
 
   // useEffect(() => {
   //   if (isDarkMode) {
@@ -90,6 +94,7 @@ export function Cadastro() {
 
   return (
     <div className="container">
+      <Navbar />
       <header>
          <img src={"./logoStudIA.png"} alt="Logo Stud.Ia" />
         <span>Crie sua conta no Stud.IA</span>
@@ -117,7 +122,7 @@ export function Cadastro() {
 
         <div className="footer">
           <p>Já tem uma conta?</p>
-          <Link to="/">Fazer login</Link>
+          <Link to="/login">Fazer login</Link>
         </div>
       </form>
       {/* <ToggleButton isDarkMode={isDarkMode} onToggle={toggleTheme} /> */}
