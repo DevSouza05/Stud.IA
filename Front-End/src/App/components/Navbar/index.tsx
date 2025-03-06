@@ -10,7 +10,6 @@ export function Navbar({ variant }) {
           <img src="./iconLogoStudia.png" alt="Stud.Ia Logo" />
         </Link>
         <ul className="navbar-menu">
-          {/* Condicional para conteúdo diferente na tela home */}
           {variant === "home" ? (
             <>
               <li><Link to="/home" className="navbar-link">Home</Link></li>
@@ -20,7 +19,6 @@ export function Navbar({ variant }) {
             </>
           ) : (
             <>
-              {/* Conteúdo para outras páginas, como login ou cadastro */}
               <li><Link to="/" className="navbar-link">Home</Link></li>
               <li><Link to="/sobre" className="navbar-link">Sobre</Link></li>
               <li><Link to="/login" className="navbar-button">Entrar</Link></li>
