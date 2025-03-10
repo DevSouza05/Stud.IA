@@ -1,6 +1,5 @@
 .navbar {
     background: transparent; /* Torna a navbar transparente */
-    backdrop-filter: blur(10px); /* Aplica um leve desfoque para melhor visibilidade */
     padding: 0.5rem;
     display: flex;
     justify-content: space-between;

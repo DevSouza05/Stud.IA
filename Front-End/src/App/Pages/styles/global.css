@@ -13,6 +13,7 @@ html, body {
 }
 
 .container {
+
     width: 100vw; /* Largura total da tela */
     height: 100vh; /* Altura total da tela */
     display: flex;
@@ -20,9 +21,9 @@ html, body {
     justify-content: center; 
     flex-direction: column;
     background: linear-gradient(145deg, #1a0f47 0%, #13141d 50%, #283361 100%);
-    overflow: hidden; 
+    overflow: visible; 
     position: relative;
-    padding: 50px 0;
+    padding: 100px 0;
 
 }
 
