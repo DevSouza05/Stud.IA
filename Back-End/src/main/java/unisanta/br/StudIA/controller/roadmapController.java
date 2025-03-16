@@ -88,46 +88,76 @@ public class roadmapController {
 
         String conteudo = String.join(", ", selecao.getSelecoes());
         String prompt = "Com base nas seguintes seleções: " + conteudo +
-                ", elabore um roadmap de estudos personalizado em formato JSON puro, sem texto adicional ou formatação Markdown, otimizado para manipulação por um frontend. " +
-                "Siga as diretrizes abaixo ao estruturar o JSON, garantindo que o planejamento seja eficiente e realista: " +
+                ", crie um roadmap de estudos personalizado em formato JSON puro, otimizado para manipulação por um frontend, sem texto adicional, formatação Markdown ou comentários explicativos. " +
+                "Siga as diretrizes abaixo para estruturar um planejamento eficiente, realista e detalhado: " +
 
-                "1. **Estrutura do JSON:** O JSON deve ser um array de objetos, sem incluir caracteres especiais '\\n', '\\', '[', ']', onde cada objeto representa um tópico/matéria com os seguintes campos: " +
-                "   - 'titulo': Nome do tópico/matéria (string); " +
-                "   - 'ordem': Número indicando a sequência ideal de estudo (inteiro); " +
-                "   - 'cronograma': Array de objetos contendo: " +
-                "       - 'dia': Data no formato 'YYYY-MM-DD', iniciando a partir de " + LocalDate.now().toString() + " ou do próximo dia útil; " +
-                "       - 'horarioInicio': Horário de início no formato 'HH:MM'; " +
-                "       - 'horarioFim': Horário de término no formato 'HH:MM'; " +
-                "       - 'cargaHoraria': Duração da sessão de estudo em horas (inteiro); " +
-                "   - 'metodosEstudo': Array de strings com métodos recomendados (ex.: 'resumos', 'exercícios práticos', 'flashcards', 'mapas mentais', 'projetos práticos'); " +
-                "   - 'locaisEstudo': Array de strings com locais sugeridos (ex.: 'casa', 'biblioteca', 'coworking'); " +
-                "   - 'materiaisApoio': Array de objetos contendo: " +
-                "       - 'tipo': Tipo do material (ex.: 'livro', 'curso online', 'vídeo-aula', 'artigo', 'documentação oficial'); " +
-                "       - 'nome': Nome e autor/fonte do material (ex.: 'Algoritmos - Cormen', 'Curso de Redes - Cisco'); " +
-                "   - 'dificuldades': Array de objetos contendo: " +
-                "       - 'descricao': Descrição da dificuldade enfrentada no tópico (string); " +
-                "       - 'estrategia': Estratégia recomendada para superação (string). " +
+                "1. **Estrutura do JSON:** " +
+                "   - Retorne um array de objetos, onde cada objeto representa um tópico ou módulo de estudo, com os campos: " +
+                "     - 'titulo': Nome do tópico ou módulo (string); " +
+                "     - 'ordem': Número da sequência ideal de estudo (inteiro, começando em 1); " +
+                "     - 'submodulos': Array de strings com subtemas ou divisões do tópico (ex.: 'Fundamentos', 'Estruturas de Dados' para 'Programação'); " +
+                "     - 'cronograma': Array de objetos com: " +
+                "         - 'dia': Data no formato 'YYYY-MM-DD', iniciando em " + LocalDate.now().toString() + " ou próximo dia útil; " +
+                "         - 'horarioInicio': Horário de início no formato 'HH:MM' (ex.: '09:00'); " +
+                "         - 'horarioFim': Horário de término no formato 'HH:MM' (ex.: '11:00'); " +
+                "         - 'cargaHoraria': Duração em horas (inteiro, entre 1 e 3); " +
+                "     - 'metodosEstudo': Array de strings com métodos sugeridos (ex.: 'resumos', 'exercícios práticos', 'flashcards', 'mapas mentais', 'projetos práticos'); " +
+                "     - 'locaisEstudo': Array de strings com locais recomendados (ex.: 'casa', 'biblioteca', 'coworking'); " +
+                "     - 'materiaisApoio': Array de objetos com: " +
+                "         - 'tipo': Tipo do material (ex.: 'livro', 'vídeo-aula', 'curso online', 'artigo', 'documentação oficial'); " +
+                "         - 'nome': Nome e fonte do material (ex.: 'Algoritmos - Cormen', 'Curso Python - Coursera'); " +
+                "         - 'link': URL específica para acesso ao material (ex.: 'https://www.coursera.org/learn/python'); " +
+                "     - 'dificuldades': Array de objetos com: " +
+                "         - 'descricao': Descrição da dificuldade (string); " +
+                "         - 'estrategia': Estratégia para superar (string); " +
+                "     - 'proximosPassos': Array de strings com sugestões do que estudar após o tópico (ex.: 'Aprofundar em X', 'Iniciar Y'); " +
+                "     - 'dicasAdicionais': Array de strings com dicas práticas (ex.: 'Pratique diariamente', 'Revise com amigos'); " +
 
-                "2. **Distribuição Inteligente do Cronograma:** " +
-                "   - O estudo deve ser distribuído de maneira equilibrada, evitando sobrecarga. " +
-                "   - Preferencialmente, sessões de estudo devem ter entre 1 e 3 horas por dia, com pausas entre blocos longos. " +
-                "   - Evite agendar mais de 4 horas consecutivas de estudo para um mesmo tópico. " +
-                "   - Dê prioridade a tópicos mais complexos no início do dia ou momentos de maior foco do usuário. " +
-                "   - Se houver tópicos interdependentes, organize-os de maneira sequencial para melhor assimilação. " +
+                "2. **Cronograma Inteligente:** " +
+                "   - Distribua as sessões de forma equilibrada, com no máximo 4 horas consecutivas por tópico e pausas entre blocos longos. " +
+                "   - Priorize tópicos complexos para horários de maior foco (ex.: manhã, entre 08:00 e 12:00). " +
+                "   - Organize tópicos interdependentes em sequência lógica (ex.: 'HTML' antes de 'CSS'). " +
+                "   - Limite sessões diárias a 6 horas no total, respeitando entre 1 e 3 horas por sessão. " +
 
-                "3. **Adaptação a Datas e Feriados:** " +
-                "   - A data inicial deve ser " + LocalDate.now().toString() + ", ajustada para o próximo dia útil, se necessário. " +
-                "   - Se a data cair em um feriado ou final de semana, prefira remanejar para um dia útil próximo. " +
-                "   - O cronograma deve evitar horários impraticáveis, como períodos noturnos (salvo exceções justificadas). " +
+                "3. **Gestão de Datas:** " +
+                "   - Inicie em " + LocalDate.now().toString() + ", ajustando para o próximo dia útil se for feriado ou fim de semana. " +
+                "   - Evite horários noturnos (após 22:00), salvo se justificável pelo contexto do tópico. " +
+                "   - Remaneje datas para evitar feriados conhecidos (ex.: Natal, Ano Novo) ou finais de semana, salvo se explicitamente solicitado. " +
 
-                "4. **Técnicas de Aprendizado Ativo:** " +
-                "   - Para tópicos mais desafiadores, inclua técnicas como aprendizado baseado em projetos, ensino reverso ou grupos de estudo. " +
-                "   - Recomende revisões periódicas (ex.: revisão espaçada) para reforçar conteúdos importantes. " +
+                "4. **Técnicas de Aprendizado:** " +
+                "   - Inclua métodos ativos para tópicos complexos (ex.: 'aprendizado baseado em projetos', 'ensino reverso', 'grupos de estudo'). " +
+                "   - Adicione revisões espaçadas em 'metodosEstudo' para tópicos fundamentais (ex.: 'Revisão em 7 dias'). " +
 
-                "5. **Formato de Saída:** " +
-                "   - Retorne apenas o JSON puro, sem envolver em chaves adicionais como 'roadmap' ou formatação externa. " +
-                "   - Certifique-se de que o JSON seja legível e facilmente manipulável por aplicações frontend e ferramentas como Postman. " +
-                "   - Evite qualquer tipo de comentário ou texto explicativo no retorno, apenas a estrutura JSON formatada corretamente.";
+                "5. **Detalhamento Extra:** " +
+                "   - Gere submódulos detalhados para cada tópico, cobrindo aspectos essenciais e complementares. " +
+                "   - Inclua links reais e confiáveis para materiais de apoio (ex.: sites oficiais, plataformas como Coursera, YouTube, ou GitHub). " +
+                "   - Forneça próximos passos claros e dicas práticas para reforçar o aprendizado e manter a motivação. " +
+
+                "6. **Saída:** " +
+                "   - Retorne apenas o JSON puro, sem chaves externas (como 'roadmap') ou formatação adicional. " +
+                "   - Garanta que o JSON seja válido, legível e manipulável por ferramentas como Postman ou aplicações frontend. " +
+
+                "7. **Nível de Proficiência e Personalização:** " +
+                "   - Adicione ao JSON, em cada tópico, um campo 'nivelDificuldade' (string: 'iniciante', 'intermediário', 'avançado') baseado na complexidade do conteúdo. " +
+                "   - Inclua um campo 'tempoEstimadoTotal' (inteiro, em horas) para conclusão do tópico, considerando submódulos e revisões. " +
+                "   - Adapte a quantidade de sessões e métodos de estudo ao nível de dificuldade (ex.: mais exercícios práticos para avançado, mais resumos para iniciante). " +
+
+                "8. **Gamificação e Motivação:** " +
+                "   - Adicione um campo 'metas' em cada tópico, um array de objetos com: " +
+                "       - 'descricao': Descrição da meta (ex.: 'Completar 10 exercícios', 'Construir um projeto simples'); " +
+                "       - 'recompensa': Sugestão de recompensa ao completar (ex.: 'Assistir um episódio de série', '15 min de pausa extra'). " +
+                "   - Inclua um campo 'progresso' (inteiro, 0 a 100) inicializado em 0 para rastrear o avanço no frontend. " +
+
+                "9. **Integração e Exportação:** " +
+                "   - Adicione um campo 'exportavel' em cada tópico, com sugestões de formatos (ex.: ['PDF', 'Google Calendar', 'Trello']) para exportação do cronograma. " +
+                "   - Inclua um campo 'notificacoes' (array de strings) com sugestões de lembretes (ex.: 'Iniciar estudo às 08:50', 'Revisão em 3 dias'). " +
+
+                "10. **Acompanhamento e Feedback:** " +
+                "   - Adicione um campo 'avaliacao' em cada tópico, um objeto com: " +
+                "       - 'dificuldadePercebida': String inicializada como 'pendente' (atualizável pelo usuário: 'fácil', 'média', 'difícil'); " +
+                "       - 'notas': Campo para observações do usuário (string, inicializada vazia); " +
+                "   - Inclua um campo 'revisoesPlanejadas', um array de objetos com 'dia' (YYYY-MM-DD) e 'duracao' (inteiro, em horas) para revisões futuras.";
+
 
 
 

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Navbar } from "../../components/Navbar/index.tsx";
-
 import "../styles/home.css";
 
 export const TelaInicial = () => {
@@ -11,6 +10,20 @@ export const TelaInicial = () => {
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [completedSubmodules, setCompletedSubmodules] = useState({});
+
+  useEffect(() => {
+    const savedCompleted = localStorage.getItem(`completedSubmodules_${userId}`);
+    if (savedCompleted) {
+      setCompletedSubmodules(JSON.parse(savedCompleted));
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    if (Object.keys(completedSubmodules).length > 0) {
+      localStorage.setItem(`completedSubmodules_${userId}`, JSON.stringify(completedSubmodules));
+    }
+  }, [completedSubmodules, userId]);
 
   useEffect(() => {
     if (!userId) {
@@ -42,12 +55,11 @@ export const TelaInicial = () => {
         }
 
         const data = await response.json();
-
         const cleanedRoadmap = data.roadmap
-          .replace("```json", "") 
-          .replace("```", "")     
-          .trim();               
-
+          .replace("```json", "")
+          .replace("```", "")
+          .trim();
+        
         const parsedRoadmap = JSON.parse(cleanedRoadmap);
         setRoadmap(parsedRoadmap);
       } catch (error) {
@@ -60,6 +72,14 @@ export const TelaInicial = () => {
 
     fetchRoadmap();
   }, [userId]);
+
+  const handleSubmoduleToggle = (itemIndex, subIndex) => {
+    const key = `${itemIndex}-${subIndex}`;
+    setCompletedSubmodules(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
 
   return (
     <div className="home-container">
@@ -77,9 +97,8 @@ export const TelaInicial = () => {
           {loading ? (
             <div className="loading-spinner"></div>
           ) : (
-            
             <div className="roadmap-container">
-              {roadmap.map((item, index) => (
+              {roadmap?.map((item, index) => (
                 <div key={index} className="roadmap-item">
                   <h3>{item.ordem}. {item.titulo}</h3>
 
@@ -104,12 +123,40 @@ export const TelaInicial = () => {
                     <p>{item.locaisEstudo.join(", ")}</p>
                   </div>
 
+                  {item.submodulos?.length > 0 && (
+                    <div className="section">
+                      <h4>Submódulos</h4>
+                      <ul>
+                        {item.submodulos.map((sub, subIndex) => {
+                          const key = `${index}-${subIndex}`;
+                          return (
+                            <li key={subIndex} className="submodule-item">
+                              <label>
+                                <input
+                                  type="checkbox"
+                                  checked={!!completedSubmodules[key]}
+                                  onChange={() => handleSubmoduleToggle(index, subIndex)}
+                                />
+                                <span className={completedSubmodules[key] ? "completed" : ""}>
+                                  {sub}
+                                </span>
+                              </label>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  )}
+
                   <div className="section">
                     <h4>Materiais de Apoio</h4>
                     <ul>
                       {item.materiaisApoio.map((material, idx) => (
                         <li key={idx}>
-                          {material.tipo}: {material.nome}
+                          {material.tipo}:{" "}
+                          <a href={material.link} target="_blank" rel="noopener noreferrer">
+                            {material.nome}
+                          </a>
                         </li>
                       ))}
                     </ul>
@@ -125,6 +172,7 @@ export const TelaInicial = () => {
                     ))}
                   </div>
                 </div>
+                
               ))}
             </div>
           )}

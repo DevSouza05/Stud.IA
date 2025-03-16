@@ -3,11 +3,18 @@
     margin: 0 auto;
     padding: 20px;
     margin-top: 80px;
+    
   }
   
+html, body{
+  background: transparent;
+  background: linear-gradient(135deg, #1a0f47 0%, #13141d 50%, #071136 100%);
+}
+
   header {
     text-align: center;
     margin-bottom: 20px;
+    
   }
   
   h1 {
