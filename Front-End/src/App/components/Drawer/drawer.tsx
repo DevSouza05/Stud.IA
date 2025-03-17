@@ -14,7 +14,7 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import { styled } from "@mui/material/styles";
 
-// Barra de Progresso
+
 const ProgressBar = ({ currentStep, totalSteps }) => {
   const steps = Array.from({ length: totalSteps }, (_, index) => index + 1);
   return (
@@ -56,8 +56,15 @@ export default function DrawerMenu() {
   };
 
   const handleNext = () => {
+    if (step === 2) {
+      if (!formData.name || !formData.email) {
+        alert('Nome e Email são obrigatórios!');
+        return;
+      }
+    }
     setStep(step + 1);
   };
+  
 
   const handleBack = () => {
     setStep(step - 1);
@@ -67,10 +74,10 @@ export default function DrawerMenu() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSkillsChange = (e) => {
-    const value = Array.from(e.target.selectedOptions, (option) => option.value);
-    setFormData({ ...formData, skills: value });
-  };
+  // const handleSkillsChange = (e) => {
+  // const value = Array.from(e.target.selectedOptions, (option) => option.value);
+  //setFormData({ ...formData, skills: value });
+  //};
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -78,7 +85,6 @@ export default function DrawerMenu() {
   };
 
   const handleSubmit = () => {
-    // Lógica de envio do formulário
     console.log(formData);
     setStep(step + 1);
   };
@@ -107,8 +113,15 @@ export default function DrawerMenu() {
         <List>
           {/* Etapa 1: Tela inicial com botão "Começar" */}
           {step === 1 && (
-            <Box>
-              <ListItemText primary="Crie seu perfil!" />
+            <Box
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              justifyContent="center"
+              textAlign="center"
+              height="10vh"
+            >
+              <ListItemText primary="Crie seu perfil!" primaryTypographyProps={{ variant: "h5", fontWeight: "bold" }} />
               <Button onClick={handleNext} variant="contained" color="primary">
                 Começar
               </Button>
@@ -117,7 +130,7 @@ export default function DrawerMenu() {
 
           {/* Etapa 2: Dados básicos - Nome e Email */}
           {step === 2 && (
-            <Box>
+            <Box display="flex" flexDirection="column" alignItems="center">
               <TextField
                 label="Nome"
                 name="name"
@@ -125,11 +138,16 @@ export default function DrawerMenu() {
                 onChange={handleChange}
                 fullWidth
                 margin="normal"
-                InputProps={{
-                  style: { color: "#fff" },
+                sx={{
+                  fieldset: { borderColor: "#fff" },
+                  "& .MuiInputBase-input": {
+                    color: "#fff",
+                    fontSize: "1.2rem" 
+                  },
+                  "& .MuiInputLabel-root": { color: "#fff" }, 
                 }}
                 InputLabelProps={{
-                  style: { color: "#fff" },
+                  shrink: true, 
                 }}
               />
               <TextField
@@ -139,11 +157,16 @@ export default function DrawerMenu() {
                 onChange={handleChange}
                 fullWidth
                 margin="normal"
-                InputProps={{
-                  style: { color: "#fff" },
+                sx={{
+                  fieldset: { borderColor: "#fff" }, 
+                  "& .MuiInputBase-input": {
+                    color: "#fff",
+                    fontSize: "1.2rem" 
+                  },
+                  "& .MuiInputLabel-root": { color: "#fff" },
                 }}
                 InputLabelProps={{
-                  style: { color: "#fff" },
+                  shrink: true, 
                 }}
               />
               <Button onClick={handleNext} variant="contained" color="primary">
@@ -152,9 +175,10 @@ export default function DrawerMenu() {
             </Box>
           )}
 
+
           {/* Etapa 3: Informações adicionais */}
           {step === 3 && (
-            <Box>
+            <Box display="flex" flexDirection="column" alignItems="center">
               <TextField
                 label="Data de Nascimento"
                 name="dob"
@@ -163,11 +187,13 @@ export default function DrawerMenu() {
                 onChange={handleChange}
                 fullWidth
                 margin="normal"
-                InputProps={{
-                  style: { color: "#fff" },
+                sx={{
+                  fieldset: { borderColor: "#fff" }, 
+                  "& .MuiInputBase-input": { color: "#fff" },
+                  "& .MuiInputLabel-root": { color: "#fff" }, 
                 }}
                 InputLabelProps={{
-                  style: { color: "#fff" },
+                  shrink: true, 
                 }}
               />
               <TextField
@@ -178,8 +204,10 @@ export default function DrawerMenu() {
                 onChange={handleChange}
                 fullWidth
                 margin="normal"
-                InputProps={{
-                  style: { color: "#fff" },
+                sx={{
+                  fieldset: { borderColor: "#fff" },
+                  "& .MuiInputBase-input": { color: "#fff" },
+                  "& .MuiInputLabel-root": { color: "#fff" },
                 }}
               >
                 <MenuItem value="masculino">Masculino</MenuItem>
@@ -193,16 +221,25 @@ export default function DrawerMenu() {
                 onChange={handleChange}
                 fullWidth
                 margin="normal"
-                InputProps={{
-                  style: { color: "#fff" },
+                sx={{
+                  fieldset: { borderColor: "#fff" },
+                  "& .MuiInputBase-input": { color: "#fff" },
+                  "& .MuiInputLabel-root": { color: "#fff" },
                 }}
               />
-              <Button onClick={handleBack} variant="contained" color="secondary">
-                Voltar
-              </Button>
-              <Button onClick={handleNext} variant="contained" color="primary" sx={{ marginLeft: "8px" }}>
-                Próximo
-              </Button>
+              <Box display="flex" justifyContent="center" width="100%" mt={2}>
+                <Button onClick={handleBack} variant="contained" color="secondary">
+                  Voltar
+                </Button>
+                <Button
+                  onClick={handleNext}
+                  variant="contained"
+                  color="primary"
+                  sx={{ marginLeft: "8px" }}
+                >
+                  Próximo
+                </Button>
+              </Box>
             </Box>
           )}
 
@@ -210,12 +247,18 @@ export default function DrawerMenu() {
           {step === 4 && (
             <Box>
               <TextField
-                label="Link do Portfólio ou GitHub"
+                label="Link do Linkedin"
                 name="portfolioLink"
                 value={formData.portfolioLink}
                 onChange={handleChange}
                 fullWidth
                 margin="normal"
+                sx={{
+                  fieldset: { borderColor: "#fff" },
+                  "& .MuiInputBase-input": { color: "#fff" },
+                  "& .MuiInputLabel-root": { color: "#fff" },
+                }}
+
                 InputProps={{
                   style: { color: "#fff" },
                 }}
@@ -230,20 +273,11 @@ export default function DrawerMenu() {
                 onChange={handleChange}
                 fullWidth
                 margin="normal"
-                InputProps={{
-                  style: { color: "#fff" },
+                sx={{
+                  fieldset: { borderColor: "#fff" },
+                  "& .MuiInputBase-input": { color: "#fff" },
+                  "& .MuiInputLabel-root": { color: "#fff" },
                 }}
-                InputLabelProps={{
-                  style: { color: "#fff" },
-                }}
-              />
-              <TextField
-                label="Link do LinkedIn"
-                name="linkedinLink"
-                value={formData.linkedinLink}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
                 InputProps={{
                   style: { color: "#fff" },
                 }}
@@ -260,10 +294,11 @@ export default function DrawerMenu() {
             </Box>
           )}
 
+
           {/* Etapa 5: Carregar foto */}
           {step === 5 && (
             <Box>
-              <Box mt={2}>
+              <Box mt={2} display="flex" justifyContent="center" width="100%">
                 <input
                   accept="image/*"
                   style={{ display: "none" }}
@@ -278,7 +313,7 @@ export default function DrawerMenu() {
                 </label>
               </Box>
               {formData.photo && (
-                <Box mt={2}>
+                <Box mt={2} display="flex" justifyContent="center" width="100%">
                   <img
                     src={URL.createObjectURL(formData.photo)}
                     alt="Foto do Perfil"
@@ -286,14 +321,18 @@ export default function DrawerMenu() {
                   />
                 </Box>
               )}
-              <Button onClick={handleBack} variant="contained" color="secondary">
-                Voltar
-              </Button>
-              <Button onClick={handleSubmit} variant="contained" color="primary" sx={{ marginLeft: "8px" }}>
-                Finalizar
-              </Button>
+              <Box display="flex" justifyContent="center" width="100%" mt={2}>
+                <Button onClick={handleBack} variant="contained" color="secondary">
+                  Voltar
+                </Button>
+                <Button onClick={handleSubmit} variant="contained" color="primary" sx={{ marginLeft: "8px" }}>
+                  Finalizar
+                </Button>
+              </Box>
             </Box>
           )}
+
+
 
           {/* Etapa 6: Perfil finalizado */}
           {step === 6 && (
