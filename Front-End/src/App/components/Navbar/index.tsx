@@ -1,12 +1,13 @@
 import { Link } from "react-router-dom";
 import "../../Pages/styles/Navbar.css";
 import React, { useState } from "react";
+import DrawerMenu from "../Drawer/drawer"
 
 export function Navbar({ variant }) {
-  const [isMenuActive, setIsMenuActive] = useState(false); 
+  const [isMenuActive, setIsMenuActive] = useState(false);
 
   const toggleMenu = () => {
-    setIsMenuActive(!isMenuActive); 
+    setIsMenuActive(!isMenuActive);
   };
 
   return (
@@ -21,18 +22,18 @@ export function Navbar({ variant }) {
             <>
               <li><Link to="/home" className="navbar-link">Home</Link></li>
               <li><Link to="/Dashboard" className="navbar-link">Progresso</Link></li>
-              {/* <li><Link to="/Roadmap" className="navbar-link">Roadmap</Link></li> */}
-              <li><Link to="/profile" className="navbar-button">Perfil</Link></li>
             </>
           ) : (
             <>
               <li><Link to="/" className="navbar-link">Home</Link></li>
               <li><Link to="/sobre" className="navbar-link">Sobre</Link></li>
               <li><Link to="/login" className="navbar-button">Entrar</Link></li>
-              {/* <li><Link to="/cadastro" className="navbar-button">Cadastrar</Link></li> */}
             </>
           )}
         </ul>
+
+        {/* O DrawerMenu só aparece quando variant for 'home' */}
+        {variant === "home" && <DrawerMenu />}
       </div>
     </nav>
   );
