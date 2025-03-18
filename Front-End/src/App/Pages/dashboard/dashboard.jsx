@@ -3,7 +3,6 @@ import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from "recha
 import "../styles/dashboard.css";
 import { Navbar } from "../../components/Navbar/index.tsx";
 
-
 const Dashboard = ({ etapas = [] }) => {
   const getNumeroDeDiasNoMes = () => {
     const dataAtual = new Date();
@@ -16,8 +15,23 @@ const Dashboard = ({ etapas = [] }) => {
 
   const numeroDeDiasNoMes = getNumeroDeDiasNoMes(); 
 
-  const [concluidos, setConcluidos] = useState(new Array(etapas.length).fill(false));
-  const [diasEstudo, setDiasEstudo] = useState(Array(numeroDeDiasNoMes).fill(false));
+  const [concluidos, setConcluidos] = useState(() => {
+    const saved = localStorage.getItem("completedSubmodules");
+    return saved ? JSON.parse(saved) : new Array(etapas.length).fill(false);
+  });
+
+  const [diasEstudo, setDiasEstudo] = useState(() => {
+    const saved = localStorage.getItem("diasEstudo");
+    return saved ? JSON.parse(saved) : Array(numeroDeDiasNoMes).fill(false);
+  });
+
+  useEffect(() => {
+    localStorage.setItem("completedSubmodules", JSON.stringify(concluidos));
+  }, [concluidos]);
+
+  useEffect(() => {
+    localStorage.setItem("diasEstudo", JSON.stringify(diasEstudo));
+  }, [diasEstudo]);
 
   const marcarConcluido = (index) => {
     const novoEstado = [...concluidos];

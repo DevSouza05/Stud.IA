@@ -11,6 +11,7 @@ export const TelaInicial = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [completedSubmodules, setCompletedSubmodules] = useState({});
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     const savedCompleted = localStorage.getItem(`completedSubmodules_${userId}`);
@@ -23,6 +24,7 @@ export const TelaInicial = () => {
     if (Object.keys(completedSubmodules).length > 0) {
       localStorage.setItem(`completedSubmodules_${userId}`, JSON.stringify(completedSubmodules));
     }
+    updateProgress();
   }, [completedSubmodules, userId]);
 
   useEffect(() => {
@@ -81,6 +83,13 @@ export const TelaInicial = () => {
     }));
   };
 
+  const updateProgress = () => {
+    if (!roadmap) return;
+    const totalSubmodules = roadmap.reduce((acc, item) => acc + (item.submodulos?.length || 0), 0);
+    const completedCount = Object.values(completedSubmodules).filter(Boolean).length;
+    setProgress(totalSubmodules > 0 ? (completedCount / totalSubmodules) * 100 : 0);
+  };
+
   return (
     <div className="home-container">
       <div className="main-content">
@@ -91,6 +100,10 @@ export const TelaInicial = () => {
 
         <div className="card">
           <h2>Visão Geral do Roadmap</h2>
+          
+          <div className="progress-container">
+            <div className="progress-bar" style={{ width: `${progress}%` }}></div>
+          </div>
 
           {error && <p className="error-message">{error}</p>}
 
@@ -147,32 +160,7 @@ export const TelaInicial = () => {
                       </ul>
                     </div>
                   )}
-
-                  <div className="section">
-                    <h4>Materiais de Apoio</h4>
-                    <ul>
-                      {item.materiaisApoio.map((material, idx) => (
-                        <li key={idx}>
-                          {material.tipo}:{" "}
-                          <a href={material.link} target="_blank" rel="noopener noreferrer">
-                            {material.nome}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="section">
-                    <h4>Dificuldades</h4>
-                    {item.dificuldades.map((difficulty, idx) => (
-                      <div key={idx} className="difficulty-item">
-                        <p><strong>Descrição:</strong> {difficulty.descricao}</p>
-                        <p><strong>Estratégia:</strong> {difficulty.estrategia}</p>
-                      </div>
-                    ))}
-                  </div>
                 </div>
-                
               ))}
             </div>
           )}

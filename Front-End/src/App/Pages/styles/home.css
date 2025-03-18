@@ -143,3 +143,20 @@
 .submodule-item input[type="checkbox"] {
   margin: 0;
 }
+
+/* Barra de Progresso */
+.progress-container {
+  width: 100%;
+  max-width: 900px;
+  background: #ddd;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 20px 0;
+}
+
+.progress-bar {
+  height: 20px;
+  width: 0%;
+  background: #1976d2;
+  transition: width 0.4s ease-in-out;
+}
