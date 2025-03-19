@@ -46,19 +46,33 @@ body{
 
 .calendario {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, 1fr); 
   gap: 5px;
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 .dia {
-  width: 30px;
-  height: 30px;
-  background-color: #f1f1f1;
-  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  background-color: #f0f0f0;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
 }
 
 .dia.estudado {
-  background-color: #76c7c0;
+  background-color: #4caf50; 
+  color: white;
+}
+
+.dia-numero {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+}
+
+.dia.estudado .dia-numero {
+  color: white; 
 }

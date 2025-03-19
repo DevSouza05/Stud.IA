@@ -5,7 +5,9 @@ import "../styles/home.css";
 
 export const TelaInicial = () => {
   const location = useLocation();
-  const [userId, setUserId] = useState(location.state?.userId || localStorage.getItem("userId"));
+  const [userId, setUserId] = useState(
+    location.state?.userId || localStorage.getItem("userId")
+  );
   const [roadmap, setRoadmap] = useState(null);
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
@@ -14,7 +16,9 @@ export const TelaInicial = () => {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const savedCompleted = localStorage.getItem(`completedSubmodules_${userId}`);
+    const savedCompleted = localStorage.getItem(
+      `completedSubmodules_${userId}`
+    );
     if (savedCompleted) {
       setCompletedSubmodules(JSON.parse(savedCompleted));
     }
@@ -22,7 +26,10 @@ export const TelaInicial = () => {
 
   useEffect(() => {
     if (Object.keys(completedSubmodules).length > 0) {
-      localStorage.setItem(`completedSubmodules_${userId}`, JSON.stringify(completedSubmodules));
+      localStorage.setItem(
+        `completedSubmodules_${userId}`,
+        JSON.stringify(completedSubmodules)
+      );
     }
     updateProgress();
   }, [completedSubmodules, userId]);
@@ -36,7 +43,9 @@ export const TelaInicial = () => {
 
     const fetchUserID = async (userId) => {
       try {
-        const response = await fetch(`http://localhost:8080/api/v1/auth/${userId}`);
+        const response = await fetch(
+          `http://localhost:8080/api/v1/auth/${userId}`
+        );
         if (!response.ok) {
           throw new Error(`Erro: ${response.status} - ${response.statusText}`);
         }
@@ -51,7 +60,9 @@ export const TelaInicial = () => {
 
     const fetchRoadmap = async () => {
       try {
-        const response = await fetch(`http://localhost:8080/api/v1/roadmap/${userId}`);
+        const response = await fetch(
+          `http://localhost:8080/api/v1/roadmap/${userId}`
+        );
         if (!response.ok) {
           throw new Error(`Erro: ${response.status} - ${response.statusText}`);
         }
@@ -61,7 +72,7 @@ export const TelaInicial = () => {
           .replace("```json", "")
           .replace("```", "")
           .trim();
-        
+
         const parsedRoadmap = JSON.parse(cleanedRoadmap);
         setRoadmap(parsedRoadmap);
       } catch (error) {
@@ -77,17 +88,23 @@ export const TelaInicial = () => {
 
   const handleSubmoduleToggle = (itemIndex, subIndex) => {
     const key = `${itemIndex}-${subIndex}`;
-    setCompletedSubmodules(prev => ({
+    setCompletedSubmodules((prev) => ({
       ...prev,
-      [key]: !prev[key]
+      [key]: !prev[key],
     }));
   };
 
   const updateProgress = () => {
     if (!roadmap) return;
-    const totalSubmodules = roadmap.reduce((acc, item) => acc + (item.submodulos?.length || 0), 0);
-    const completedCount = Object.values(completedSubmodules).filter(Boolean).length;
-    setProgress(totalSubmodules > 0 ? (completedCount / totalSubmodules) * 100 : 0);
+    const totalSubmodules = roadmap.reduce(
+      (acc, item) => acc + (item.submodulos?.length || 0),
+      0
+    );
+    const completedCount =
+      Object.values(completedSubmodules).filter(Boolean).length;
+    setProgress(
+      totalSubmodules > 0 ? (completedCount / totalSubmodules) * 100 : 0
+    );
   };
 
   return (
@@ -100,9 +117,11 @@ export const TelaInicial = () => {
 
         <div className="card">
           <h2>Visão Geral do Roadmap</h2>
-          
+
           <div className="progress-container">
-            <div className="progress-bar" style={{ width: `${progress}%` }}></div>
+            <div className="progress-bar" style={{ width: `${progress}%` }}>
+              <span className="progress-text">{Math.round(progress)}%</span>
+            </div>
           </div>
 
           {error && <p className="error-message">{error}</p>}
@@ -113,14 +132,17 @@ export const TelaInicial = () => {
             <div className="roadmap-container">
               {roadmap?.map((item, index) => (
                 <div key={index} className="roadmap-item">
-                  <h3>{item.ordem}. {item.titulo}</h3>
+                  <h3>
+                    {item.ordem}. {item.titulo}
+                  </h3>
 
                   <div className="section">
                     <h4>Cronograma</h4>
                     <ul>
                       {item.cronograma.map((schedule, idx) => (
                         <li key={idx}>
-                          {schedule.dia} - {schedule.horarioInicio} às {schedule.horarioFim} ({schedule.cargaHoraria}h)
+                          {schedule.dia} - {schedule.horarioInicio} às{" "}
+                          {schedule.horarioFim} ({schedule.cargaHoraria}h)
                         </li>
                       ))}
                     </ul>
@@ -148,9 +170,15 @@ export const TelaInicial = () => {
                                 <input
                                   type="checkbox"
                                   checked={!!completedSubmodules[key]}
-                                  onChange={() => handleSubmoduleToggle(index, subIndex)}
+                                  onChange={() =>
+                                    handleSubmoduleToggle(index, subIndex)
+                                  }
                                 />
-                                <span className={completedSubmodules[key] ? "completed" : ""}>
+                                <span
+                                  className={
+                                    completedSubmodules[key] ? "completed" : ""
+                                  }
+                                >
                                   {sub}
                                 </span>
                               </label>
