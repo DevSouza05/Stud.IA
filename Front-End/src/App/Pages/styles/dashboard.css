@@ -1,11 +1,16 @@
-body{
+body {
   background: linear-gradient(135deg, #1a0f47 0%, #13141d 50%, #283361 100%);
+  margin: 0;
+  font-family: Arial, sans-serif;
 }
+
 
 .progresso-container {
   padding: 20px;
-  max-width: 800px;
+  max-width: 90%; 
   margin: 0 auto;
+  box-sizing: border-box;
+  margin-top: 80px; 
 }
 
 .progresso-bar {
@@ -13,6 +18,7 @@ body{
   background-color: #e0e0e0;
   border-radius: 10px;
   margin-bottom: 20px;
+  width: 100%;
 }
 
 .progresso {
@@ -63,7 +69,7 @@ body{
 }
 
 .dia.estudado {
-  background-color: #4caf50; 
+  background-color: #4caf50;
   color: white;
 }
 
@@ -74,5 +80,82 @@ body{
 }
 
 .dia.estudado .dia-numero {
-  color: white; 
+  color: white;
+}
+
+
+@media (max-width: 768px) {
+  .progresso-container {
+    padding: 15px;
+    margin-top: 60px; 
+  }
+
+  .progresso-bar {
+    height: 15px;
+  }
+
+  .calendario {
+    grid-template-columns: repeat(7, 1fr); 
+  }
+
+  .dia {
+    width: 30px;
+    height: 30px;
+  }
+
+  .progresso {
+    height: 100%;
+    transition: width 0.5s ease-in-out;
+  }
+
+  h2 {
+    font-size: 1.5rem; 
+  }
+
+  .dias-estudados p {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .progresso-container {
+    padding: 10px;
+    margin-top: 50px; 
+  }
+
+  .progresso-bar {
+    height: 12px;
+  }
+
+  .progresso {
+    height: 100%;
+    transition: width 0.5s ease-in-out;
+  }
+
+  .calendario {
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+  }
+
+  .dia {
+    width: 25px;
+    height: 25px;
+  }
+
+  .dia-numero {
+    font-size: 12px;
+  }
+
+  .progresso-container h2 {
+    font-size: 1.2rem;
+  }
+
+  .dias-estudados p {
+    font-size: 0.9rem;
+  }
+
+ 
+  .recharts-responsive-container {
+    height: 250px;
+  }
 }
