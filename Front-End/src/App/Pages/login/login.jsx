@@ -11,6 +11,8 @@ export function App() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState(""); 
+  const [messageType, setMessageType] = useState("error");
   const navigate = useNavigate();
 
   function handleChange(event) {
@@ -24,19 +26,22 @@ export function App() {
   async function handleSubmit(event) {
     event.preventDefault();
 
+    setMessage(""); 
+    setMessageType("error"); 
+
     if (!formData.email) {
-      alert("O email é obrigatório!");
+      setMessage("O email é obrigatório!");
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      alert("Por favor, insira um e-mail válido.");
+      setMessage("Por favor, insira um e-mail válido.");
       return;
     }
 
     if (!formData.senha || formData.senha.length < 6) {
-      alert("A senha deve ter no mínimo 6 caracteres.");
+      setMessage("A senha deve ter no mínimo 6 caracteres.");
       return;
     }
 
@@ -56,23 +61,31 @@ export function App() {
       console.log("🟢 Resposta da API:", responseData);
 
       if (response.status === 200) {
-        alert("Usuário autenticado com sucesso!");
-        localStorage.setItem("userId", responseData.userID);
+        setMessage("Usuário autenticado com sucesso!");
+        setMessageType("success"); 
 
-        const hasSelecoes = responseData.selecoes?.length > 0;
-        const destino = hasSelecoes ? "/home" : "/SwiperPage";
-        const mensagem = hasSelecoes
-          ? "Usuário já criou seleções."
-          : "Usuário ainda não criou seleções.";
+        
+        setTimeout(() => {
+          localStorage.setItem("userId", responseData.userID);
 
-        alert(mensagem);
-        navigate(destino, { state: { userId: responseData.userID } });
+          const hasSelecoes = responseData.selecoes?.length > 0;
+          const destino = hasSelecoes ? "/home" : "/SwiperPage";
+          const mensagem = hasSelecoes
+            ? "Usuário já criou seleções."
+            : "Usuário ainda não criou seleções.";
+
+          setMessage(mensagem); 
+          setMessageType("success"); 
+          navigate(destino, { state: { userId: responseData.userID } });
+        }, 3000); 
       } else {
-        alert(responseData?.message || "Erro desconhecido. Tente novamente.");
+        setMessage(responseData?.message || "Erro desconhecido. Tente novamente.");
+        setMessageType("error"); 
       }
     } catch (error) {
       console.error("🔴 Erro ao autenticar usuário:", error);
-      alert("Erro ao autenticar usuário. Tente novamente.");
+      setMessage("Erro ao autenticar usuário. Tente novamente.");
+      setMessageType("error"); 
     } finally {
       setLoading(false);
     }
@@ -116,9 +129,16 @@ export function App() {
         <a href="#">Esqueceu sua senha?</a>
 
         <button className="button" disabled={loading}>
-          {loading ? "Entrando..." : "Entrar"}
+          {loading ? "Carregando..." : "Entrar"}
           {!loading && <img src={arrow} alt="Seta" />}
         </button>
+
+       
+        {message && (
+          <div className={messageType === "error" ? "error-message" : "success-message"}>
+            {message}
+          </div>
+        )}
 
         <div className="footer">
           <p>Ainda não tem uma conta?</p>
