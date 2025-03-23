@@ -1,13 +1,15 @@
+/* Base e Containers */
 .home-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
-  background-color: black;
   background: linear-gradient(135deg, #1a0f47 0%, #13141d 50%, #283361 100%);
-  padding: 30px;
+  padding: 20px;
   padding-top: 80px;
-  font-family: "Arial", sans-serif;
+  font-family: 'Poppins', 'Arial', sans-serif;
+  color: #333;
+  font-size: 16px;
 }
 
 .main-content {
@@ -16,107 +18,241 @@
   text-align: center;
 }
 
+/* Cabeçalhos */
+.home-container h1 {
+  color: white;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.home-container h2 {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.4rem;
+  font-weight: 400;
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+/* Card principal */
 .card {
   background: #ffffff;
   border-radius: 12px;
   padding: 25px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   margin-top: 20px;
+  position: relative; /* Para posicionamento dos botões de navegação */
 }
 
-.error-message {
-  color: #d32f2f;
-  font-weight: bold;
-  text-align: center;
+.card h2 {
+  color: #2a5298;
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  text-shadow: none;
 }
 
-.loading-message {
-  color: #1976d2;
-  text-align: center;
+/* Barra de progresso */
+.progress-container {
+  width: 100%;
+  height: 28px;
+  background: #f5f7fa;
+  border-radius: 14px;
+  overflow: hidden;
+  margin: 20px 0 30px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  position: relative;
 }
 
-.roadmap-container {
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(to right, #4facfe, #00f2fe);
+  border-radius: 14px;
+  transition: width 0.6s cubic-bezier(0.65, 0, 0.35, 1);
   display: flex;
-  flex-direction: column;
-  gap: 20px;
+  align-items: center;
+  justify-content: center;
 }
 
+.progress-text {
+  color: white;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+/* Controladores de Paginação */
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0 10px;
+}
+
+.pagination-button {
+  background: #2a5298;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.pagination-button:hover {
+  background: #1e3c72;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.pagination-button:disabled {
+  background: #b0bec5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.pagination-indicator {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #455a64;
+}
+
+/* Contador de módulos */
+.module-counter {
+  padding: 5px 15px;
+  background: #e3f2fd;
+  border-radius: 20px;
+  color: #2a5298;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Container do Roadmap - Agora para paginação */
+.roadmap-container {
+  position: relative;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Animação para troca de itens */
 .roadmap-item {
-  background: #fdfdfd;
-  padding: 20px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease-in-out;
+  background: #ffffff;
+  padding: 22px;
+  border-radius: 12px;
+  border-left: 5px solid #4facfe;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  text-align: left;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .roadmap-item:hover {
-  transform: scale(1.02);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
 }
 
 .roadmap-item h3 {
-  color: #1976d2;
+  color: #2a5298;
+  font-size: 1.4rem;
   margin-bottom: 15px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eaeef2;
 }
 
+/* Organização em duas colunas dentro dos itens */
+.roadmap-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+/* Seções dentro dos itens - Simplificadas */
 .section {
-  margin-bottom: 15px;
-  text-align: left;
+  margin-bottom: 18px;
+  background: #f8fafc;
+  padding: 15px;
+  border-radius: 8px;
 }
 
 .section h4 {
-  color: #444;
-  margin-bottom: 8px;
-  font-size: 1.2em;
+  color: #455a64;
+  font-size: 1.1rem;
+  margin: 0 0 10px 0;
+  border-bottom: 1px solid #eaeef2;
+  padding-bottom: 8px;
 }
 
 .section ul {
   list-style-type: none;
   padding: 0;
-}
-
-.section ul li {
-  padding: 5px 0;
-  color: #666;
-}
-
-.section p {
-  color: #555;
   margin: 0;
 }
 
-.difficulty-item {
-  background: #f8d7da;
-  padding: 12px;
-  border-radius: 6px;
-  margin-top: 10px;
-  border-left: 5px solid #d32f2f;
+.section ul li {
+  padding: 6px 0;
+  color: #546e7a;
+  font-size: 1.05rem;
 }
 
-.difficulty-item strong {
-  color: #333;
+.section p {
+  color: #546e7a;
+  margin: 8px 0;
+  font-size: 1.05rem;
+  line-height: 1.5;
 }
 
-.home-container h1{
-  color: white;
-}
-.home-container h2{
-  color: white;
+/* Submódulos com checkbox - Simplificados */
+.submodule-item {
+  margin: 10px 0;
 }
 
+.submodule-item label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 6px;
+}
+
+.submodule-item input[type="checkbox"] {
+  margin: 0;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.submodule-item span {
+  font-size: 1.05rem;
+}
+
+.completed {
+  text-decoration: line-through;
+  color: #90a4ae;
+}
+
+/* Loading spinner */
 .loading-spinner {
   width: 50px;
   height: 50px;
-  border: 5px solid #f3f3f3; 
-  border-top: 5px solid #3498db; 
+  border: 4px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
-  animation: spin 2s linear infinite; 
-  
-  position: fixed; 
-  top: 50%; 
+  border-top: 4px solid #ffffff;
+  animation: spin 1s linear infinite;
+  position: fixed;
+  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 1000; 
 }
 
 @keyframes spin {
@@ -124,57 +260,87 @@
   100% { transform: rotate(360deg); }
 }
 
-.submodule-item {
-  margin: 5px 0;
+/* Mensagens */
+.error-message {
+  color: #f44336;
+  padding: 12px;
+  background: #ffebee;
+  border-radius: 6px;
+  margin: 15px 0;
+  font-size: 1.05rem;
 }
 
-.submodule-item label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
+/* Ocultar seções menos importantes por padrão */
+.section.secondary {
+  display: none;
 }
 
-.completed {
-  text-decoration: line-through;
-  color: #666;
-}
-
-.submodule-item input[type="checkbox"] {
-  margin: 0;
-}
-
-
-.progress-container {
+/* Botão para mostrar/ocultar mais informações */
+.toggle-details {
+  display: block;
   width: 100%;
-  height: 30px;
-  max-width: 900px;
-  background:  #f0f0f0;;
-  border-radius: 20px;
-  overflow: hidden;
-  padding: 5px;
+  background: #f0f4f8;
+  border: none;
+  border-radius: 6px;
+  padding: 10px;
+  margin-top: 12px;
+  color: #4a6572;
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.toggle-details:hover {
+  background: #e1e7ec;
+}
+
+/* Links para materiais */
+.material-link {
+  color: #2196f3;
+  text-decoration: none;
+  margin-left: 5px;
+  font-size: 1.05rem;
+}
+
+/* Mensagem para telas vazias */
+.empty-message {
+  text-align: center;
+  padding: 30px;
+  color: #78909c;
+  font-size: 1.2rem;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 10px;
   margin: 20px 0;
-  position: relative; 
 }
 
-.progress-bar {
-  height: 20px;
-  width: 0%;
-  background: linear-gradient(to right, #1976d2, #42a5f5);
-  border-radius: 15px;
-  transition: width 0.4s ease-in-out;
-  display: flex;
-  align-items: center;
-  justify-content: center; 
-  color: white; 
-  font-weight: bold; 
-  font-size: 14px; 
-}
-
-.progress-text {
-  position: absolute; 
-  color: white;
-  font-weight: bold;
-  font-size: 14px;
-  z-index: 1; 
+/* Responsividade */
+@media (max-width: 768px) {
+  .roadmap-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .home-container {
+    padding: 15px;
+    padding-top: 70px;
+    font-size: 15px;
+  }
+  
+  .card {
+    padding: 18px;
+  }
+  
+  .home-container h1 {
+    font-size: 2.2rem;
+  }
+  
+  .home-container h2 {
+    font-size: 1.2rem;
+  }
+  
+  .pagination-button {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
 }
