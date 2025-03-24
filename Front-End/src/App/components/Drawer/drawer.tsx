@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { styled } from "@mui/material/styles";
-
+import { jsPDF } from "jspdf";
 
 const ProgressBar = ({ currentStep, totalSteps }) => {
   const steps = Array.from({ length: totalSteps }, (_, index) => index + 1);
@@ -74,11 +74,6 @@ export default function DrawerMenu() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // const handleSkillsChange = (e) => {
-  // const value = Array.from(e.target.selectedOptions, (option) => option.value);
-  //setFormData({ ...formData, skills: value });
-  //};
-
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     setFormData({ ...formData, photo: file });
@@ -88,6 +83,62 @@ export default function DrawerMenu() {
     console.log(formData);
     setStep(step + 1);
   };
+
+  const generatePDF = () => {
+    const doc = new jsPDF();
+  
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+  
+    // Cabeçalho com o nome do usuário e título
+    doc.setFontSize(14);
+    doc.text("Currículo", 20, 30);
+  
+    // Linha separadora
+    doc.setLineWidth(0.5);
+    doc.line(20, 35, 190, 35);
+  
+    // Dados pessoais
+    doc.setFontSize(12);
+    doc.text("Dados Pessoais", 20, 45);
+    doc.setFontSize(10);
+    doc.text(`Nome: ${formData.name}`, 20, 55);
+    doc.text(`Email: ${formData.email}`, 20, 65);
+    doc.text(`Data de Nascimento: ${formData.dob}`, 20, 75);
+    doc.text(`Gênero: ${formData.gender}`, 20, 85);
+    
+    // Linha separadora
+    doc.line(20, 90, 190, 90);
+  
+    // Objetivo profissional
+    doc.setFontSize(12);
+    doc.text("Objetivo Profissional", 20, 100);
+    doc.setFontSize(10);
+    doc.text(formData.professionalObjective, 20, 110, { maxWidth: 170 });
+  
+    // Linha separadora
+    doc.line(20, 120, 190, 120);
+  
+    // Link de portfólio, GitHub, LinkedIn
+    doc.setFontSize(12);
+    doc.text("Links", 20, 130);
+    doc.setFontSize(10);
+    doc.text(`Portfólio: ${formData.portfolioLink}`, 20, 140);
+    doc.text(`GitHub: ${formData.githubLink}`, 20, 150);
+  
+    // Linha separadora
+    doc.line(20, 165, 190, 165);
+  
+    // Se houver foto, adicionar ao PDF
+    if (formData.photo) {
+      const img = URL.createObjectURL(formData.photo);
+      doc.addImage(img, "JPEG", 150, 40, 40, 40); // Adiciona a foto do perfil
+    }
+  
+    // Salvar o PDF
+    doc.save("curriculo_usuario.pdf");
+  };
+  
 
   return (
     <>
@@ -174,6 +225,7 @@ export default function DrawerMenu() {
               </Button>
             </Box>
           )}
+
 
 
           {/* Etapa 3: Informações adicionais */}
@@ -358,6 +410,10 @@ export default function DrawerMenu() {
               </Button>
               <Button onClick={() => setStep(2)} variant="contained" color="secondary" sx={{ marginLeft: "8px" }}>
                 Editar Perfil
+              </Button>
+
+              <Button onClick={(generatePDF)} variant="contained" color="secondary" sx={{ marginLeft: "8px" }}>
+                PDF
               </Button>
             </Box>
           )}
