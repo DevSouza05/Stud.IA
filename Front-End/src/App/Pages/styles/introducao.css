@@ -2,83 +2,159 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    background: linear-gradient(135deg, #1a0f47 0%, #13141d 50%, #283361 100%); 
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1a0f47 0%, #13141d 50%, #283361 100%);
     color: white;
-    font-family: 'Arial', sans-serif;
-    padding: 20px;
-  }
-  
-  .intro-content {
+    font-family: 'Inter', sans-serif;
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Elementos decorativos de fundo */
+.intro-container::before {
+    content: '';
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+    top: -150px;
+    right: -150px;
+    border-radius: 50%;
+    animation: float 15s infinite ease-in-out;
+}
+
+.intro-content {
     flex: 1;
-    max-width: 600px;
-    text-align: left; 
+    max-width: 800px;
+    text-align: left;
     animation: fadeIn 1.5s ease-in-out;
-  }
-  
-  .intro-content h1 {
-    font-size: 3.5rem;
-    font-weight: bold;
-    margin-bottom: 20px;
+    padding: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.intro-content h1 {
+    font-size: 4rem;
+    font-weight: 800;
+    margin-bottom: 30px;
+    background: linear-gradient(45deg, #fff, #e0e7ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     animation: slideIn 1s ease-out;
-  }
-  
-  .intro-content h2, .intro-content h3 {
+    letter-spacing: -1px;
+}
+
+.intro-content h2 {
     font-size: 1.5rem;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+    line-height: 1.4;
+    opacity: 0.95;
+    font-weight: 500;
+    animation: fadeInText 2s ease-out;
+}
+
+.intro-content h3 {
+    font-size: 1.5rem;
+    margin-bottom: 25px;
     line-height: 1.6;
     opacity: 0.9;
-    animation: fadeInText 2s ease-out;
-  }
-  
-  .intro-button {
-    padding: 12px 25px;
+    font-weight: 500;
+    max-width: 90%;
+    animation: fadeInText 2.5s ease-out;
+}
+
+.intro-button {
+    padding: 15px 35px;
     font-size: 1.2rem;
-    background-color: #fff;
-    color: #283361; /* Cor mais escura do gradiente */
-    border: none;
-    border-radius: 5px;
+    background: transparent;
+    color: white;
+    border: 2px solid #4facfe;
+    border-radius: 30px;
     cursor: pointer;
-    margin-top: 30px;
+    margin-top: 40px;
     transition: all 0.3s ease;
-  }
-  
-  .intro-button:hover {
-    background-color: #f1f1f1;
+    font-weight: 600;
+}
+
+.intro-button:hover {
+    background: rgba(79, 172, 254, 0.1);
     transform: translateY(-3px);
-  }
-  
-  .intro-image {
-    display: none; /* Não está sendo usada neste momento */
-  }
-  
-  /* Animações */
-  @keyframes fadeIn {
+}
+
+.intro-button:active {
+    transform: translateY(1px);
+}
+
+.intro-image {
+    flex: 1;
+    max-width: 500px;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 2s ease-in-out;
+}
+
+/* Animações */
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+@keyframes slideIn {
     0% {
-      opacity: 0;
+        transform: translateY(-30px);
+        opacity: 0;
     }
     100% {
-      opacity: 1;
+        transform: translateY(0);
+        opacity: 1;
     }
-  }
-  
-  @keyframes slideIn {
+}
+
+@keyframes fadeInText {
     0% {
-      transform: translateY(-50px);
-      opacity: 0;
+        opacity: 0;
+        transform: translateX(-20px);
     }
     100% {
-      transform: translateY(0);
-      opacity: 1;
+        opacity: 1;
+        transform: translateX(0);
     }
-  }
-  
-  @keyframes fadeInText {
-    0% {
-      opacity: 0;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
     }
-    100% {
-      opacity: 1;
+    50% {
+        transform: translateY(-30px) rotate(180deg);
     }
-  }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .intro-container {
+        padding: 20px;
+    }
+
+    .intro-content h1 {
+        font-size: 2.5rem;
+    }
+
+    .intro-content h2 {
+        font-size: 1.5rem;
+    }
+
+    .intro-content h3 {
+        font-size: 1.1rem;
+        max-width: 100%;
+    }
+
+    .intro-button {
+        padding: 12px 25px;
+        font-size: 1.1rem;
+    }
+}
   

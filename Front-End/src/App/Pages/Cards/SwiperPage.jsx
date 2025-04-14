@@ -14,7 +14,8 @@ export function SwiperPage() {
   const [dificuldadeEscolhida, setDificuldadeEscolhida] = useState(null);
   const [diasEscolhidos, setDiasEscolhidos] = useState([]);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [dificuldades, setDificuldades] = useState([]); 
+  const [dificuldades, setDificuldades] = useState([]);
+  const [notification, setNotification] = useState({ show: false, message: "", type: "" });
   const navigate = useNavigate();
 
   const trilhas = [
@@ -24,17 +25,16 @@ export function SwiperPage() {
     "Infraestrutura",
     "Redes",
     "Data Science",
-    "Inteligencia Artificial",
+    "Inteligência Artificial",
     "Cybersecurity",
     "Blockchain",
     "Mobile Development",
     "Game Development",
-    "Cloud Computing"
+    "Cloud Computing",
   ];
-  
-  const senioridade = ["Estudante", "Junior","Pleno","Sênior"];
 
- 
+  const senioridade = ["Estudante", "Júnior", "Pleno", "Sênior"];
+
   const dificuldadesMap = {
     Frontend: [
       "Fundamentos de HTML, CSS e JavaScript",
@@ -48,7 +48,7 @@ export function SwiperPage() {
       "WebAssembly e otimização de renderização",
       "Acessibilidade e SEO em aplicações web",
       "Progressive Web Apps (PWA) e Service Workers",
-      "Animações avançadas e interatividade (GSAP, Framer Motion)"
+      "Animações avançadas e interatividade (GSAP, Framer Motion)",
     ],
     Backend: [
       "Fundamentos de APIs REST e JSON",
@@ -62,7 +62,7 @@ export function SwiperPage() {
       "Escalabilidade e balanceamento de carga",
       "GraphQL e alternativas ao REST",
       "CI/CD para automação de deploys",
-      "Observabilidade e logging estruturado"
+      "Observabilidade e logging estruturado",
     ],
     DevOps: [
       "Conceitos de CI/CD e automação de deploy",
@@ -76,7 +76,7 @@ export function SwiperPage() {
       "Pipeline CI/CD otimizado",
       "Análise de custos em nuvem",
       "Backup e recuperação automatizados",
-      "Alta disponibilidade e disaster recovery"
+      "Alta disponibilidade e disaster recovery",
     ],
     Infraestrutura: [
       "Redes e protocolos (TCP/IP, DNS, HTTP/HTTPS)",
@@ -90,7 +90,7 @@ export function SwiperPage() {
       "Proteção contra ataques DDoS",
       "Virtualização e gerenciamento de servidores",
       "Firewall avançado e segmentação de rede",
-      "Alta disponibilidade em sistemas distribuídos"
+      "Alta disponibilidade em sistemas distribuídos",
     ],
     "Data Science": [
       "Análise de dados com Pandas e Numpy",
@@ -104,7 +104,7 @@ export function SwiperPage() {
       "Deploy de modelos de IA em produção",
       "Tratamento de dados desbalanceados",
       "Big Data e processamento distribuído",
-      "Análise de séries temporais"
+      "Análise de séries temporais",
     ],
     "Inteligência Artificial": [
       "Introdução a IA e aprendizado de máquina",
@@ -118,7 +118,7 @@ export function SwiperPage() {
       "Otimização e compressão de modelos",
       "Deploy de IA em edge computing",
       "Treinamento distribuído de modelos",
-      "Simulações e modelagem probabilística"
+      "Simulações e modelagem probabilística",
     ],
     Cybersecurity: [
       "Fundamentos de segurança da informação",
@@ -132,7 +132,7 @@ export function SwiperPage() {
       "Implementação de SIEM e SOC",
       "Hardening de servidores e sistemas",
       "Detecção e prevenção de intrusões",
-      "Segurança em ambientes cloud e DevSecOps"
+      "Segurança em ambientes cloud e DevSecOps",
     ],
     "Mobile Development": [
       "Desenvolvimento nativo (Swift, Kotlin)",
@@ -146,7 +146,7 @@ export function SwiperPage() {
       "Arquitetura modular e escalável",
       "Testes automatizados em apps mobile",
       "Desenvolvimento de aplicativos offline-first",
-      "Animações e transições avançadas"
+      "Animações e transições avançadas",
     ],
     "Game Development": [
       "Fundamentos de desenvolvimento de jogos",
@@ -160,7 +160,7 @@ export function SwiperPage() {
       "Realidade aumentada e virtual (AR/VR)",
       "Sistemas de partículas e shaders",
       "Monetização e publicação de jogos",
-      "Game design e balanceamento de jogabilidade"
+      "Game design e balanceamento de jogabilidade",
     ],
     "Cloud Computing": [
       "Fundamentos de computação em nuvem",
@@ -174,14 +174,14 @@ export function SwiperPage() {
       "Computação distribuída e Edge Computing",
       "Monitoramento e observabilidade na nuvem",
       "Gerenciamento de permissões e identidade",
-      "Otimização de performance para workloads em cloud"
+      "Otimização de performance para workloads em cloud",
     ],
   };
-  
+
   const handleTrilhaClick = (trilha) => {
     setTrilhaEscolhida(trilha);
-    setDificuldades(dificuldadesMap[trilha] || []);  
-    setDificuldadeEscolhida(null); 
+    setDificuldades(dificuldadesMap[trilha] || []);
+    setDificuldadeEscolhida(null);
     console.log("Trilha escolhida:", trilha);
   };
 
@@ -196,18 +196,34 @@ export function SwiperPage() {
   };
 
   const handleDiaClick = (dia) => {
-    if (diasEscolhidos.includes(dia)) {
-      setDiasEscolhidos(diasEscolhidos.filter((d) => d !== dia));
-    } else {
-      setDiasEscolhidos([...diasEscolhidos, dia]);
-    }
+    setDiasEscolhidos((prev) =>
+      prev.includes(dia) ? prev.filter((d) => d !== dia) : [...prev, dia]
+    );
+    console.log("Dias escolhidos:", diasEscolhidos);
+  };
+
+  const showNotification = (message, type = "success") => {
+    setNotification({ show: true, message, type });
+    setTimeout(() => {
+      setNotification({ show: false, message: "", type: "" });
+      if (type === "success") {
+        navigate("/home");
+      }
+    }, 3000);
   };
 
   const handleConfirmar = async () => {
     if (isSubmitted) return;
 
+    const userID = localStorage.getItem("userId");
+    if (!userID) {
+      showNotification("Usuário não autenticado. Faça login novamente.", "error");
+      setTimeout(() => navigate("/login"), 3000);
+      return;
+    }
+
     const dadosResumo = {
-      userID: localStorage.getItem("userId"),
+      userID,
       selecoes: [
         trilhaEscolhida,
         senioridadeEscolhida,
@@ -216,10 +232,12 @@ export function SwiperPage() {
       ].filter(Boolean),
     };
 
-    console.log("Dados confirmados:", JSON.stringify(dadosResumo, null, 2));
-
     try {
-      const response = await fetch("http://localhost:8080/api/v1/roadmap", {
+      setIsSubmitted(true);
+
+      const minLoadingTime = new Promise((resolve) => setTimeout(resolve, 250));
+
+      const fetchPromise = fetch("http://localhost:8080/api/v1/roadmap", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -227,33 +245,42 @@ export function SwiperPage() {
         body: JSON.stringify(dadosResumo),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Resposta da API:", data);
-        alert("Seleções salvas com sucesso!");
-        navigate("/home");
-        setIsSubmitted(true);
+      const [response] = await Promise.all([fetchPromise, minLoadingTime]);
+
+      let data;
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
       } else {
-        console.error("Erro na requisição:", response.statusText);
-        alert("Erro ao salvar seleções.");
+        const textResponse = await response.text();
+        data = { message: textResponse || "Resposta não JSON recebida" };
+      }
+
+      if (response.ok) {
+        console.log("Resposta da API:", data);
+        showNotification("Seleções salvas com sucesso!", "success");
+      } else {
+        console.error("Erro na requisição:", response.status, data);
+        const errorMessage = data?.message || "Erro ao salvar seleções. Tente novamente.";
+        showNotification(errorMessage, "error");
+        setIsSubmitted(false);
       }
     } catch (error) {
-      console.error("Erro na requisição:", error);
-      alert("Erro ao salvar seleções.");
+      console.error("Erro na requisição:", error.message);
+      showNotification("Erro de conexão com o servidor. Verifique sua conexão e tente novamente.", "error");
+      setIsSubmitted(false);
     }
   };
 
-  const todosCamposSelecionados =
-    trilhaEscolhida &&
-    dificuldadeEscolhida &&
-    diasEscolhidos.length > 0;
+  const todosCamposSelecionados = trilhaEscolhida && dificuldadeEscolhida && diasEscolhidos.length > 0;
 
   return (
-    <div className="container">
-      <header>
-        <span></span>
-      </header>
-
+    <div className="swiper-page-container">
+      {notification.show && (
+        <div className={`notification ${notification.type} show`}>
+          {notification.message}
+        </div>
+      )}
       <Swiper
         cssMode={true}
         navigation={true}
@@ -266,12 +293,13 @@ export function SwiperPage() {
         {/* Slide 1 - Começar */}
         <SwiperSlide>
           <div className="inicio-container">
-            <header className="inicio-header">
-              <h1>Bem-vindo ao Seu Guia de Aprendizado 💻</h1>
+            <div className="inicio-header">
+              <div className="titulo-container">
+                <h1>Bem-vindo ao Seu Guia de Aprendizado</h1>
+              </div>
               <p>Descubra sua trilha ideal e comece sua jornada agora!</p>
               <p>Clique na seta ao lado para continuar!</p>
-            </header>
-            <div className="inicio-content"></div>
+            </div>
           </div>
         </SwiperSlide>
 
@@ -284,9 +312,7 @@ export function SwiperPage() {
               {trilhas.map((trilha) => (
                 <button
                   key={trilha}
-                  className={`trilha-card ${
-                    trilhaEscolhida === trilha ? "selected" : ""
-                  }`}
+                  className={`trilha-card ${trilhaEscolhida === trilha ? "selected" : ""}`}
                   onClick={() => handleTrilhaClick(trilha)}
                 >
                   {trilha}
@@ -313,9 +339,7 @@ export function SwiperPage() {
               ].map((dia) => (
                 <button
                   key={dia}
-                  className={`trilha-card ${
-                    diasEscolhidos.includes(dia) ? "selected" : ""
-                  }`}
+                  className={`trilha-card ${diasEscolhidos.includes(dia) ? "selected" : ""}`}
                   onClick={() => handleDiaClick(dia)}
                 >
                   {dia}
@@ -328,17 +352,13 @@ export function SwiperPage() {
         {/* Slide 4 - Dificuldades no código */}
         <SwiperSlide>
           <div className="slide-content">
-            <h2>
-              Quais são os chefões que você ainda precisa derrotar no código? 🎮
-            </h2>
+            <h2>Quais são os chefões que você ainda precisa derrotar no código? 🎮</h2>
             <p>Escolha uma das opções abaixo:</p>
             <div className="trilhas-container">
               {dificuldades.map((dificuldade) => (
                 <button
                   key={dificuldade}
-                  className={`trilha-card ${
-                    dificuldadeEscolhida === dificuldade ? "selected" : ""
-                  }`}
+                  className={`trilha-card ${dificuldadeEscolhida === dificuldade ? "selected" : ""}`}
                   onClick={() => handleDificuldadeClick(dificuldade)}
                 >
                   {dificuldade}
@@ -348,7 +368,7 @@ export function SwiperPage() {
           </div>
         </SwiperSlide>
 
-        {/* Slide 5 - Nível de experiência */}
+        {/* Slide 5 - Nível de senioridade */}
         <SwiperSlide>
           <div className="slide-content">
             <h2>Qual seu nível de senioridade? 🚀</h2>
@@ -357,9 +377,7 @@ export function SwiperPage() {
               {senioridade.map((nivel) => (
                 <button
                   key={nivel}
-                  className={`trilha-card ${
-                    senioridadeEscolhida === nivel ? "selected" : ""
-                  }`}
+                  className={`trilha-card ${senioridadeEscolhida === nivel ? "selected" : ""}`}
                   onClick={() => handleSenioridadeClick(nivel)}
                 >
                   {nivel}
@@ -372,31 +390,34 @@ export function SwiperPage() {
         {/* Slide 6 - Resumo */}
         <SwiperSlide>
           <div className="slide-content resumo-container">
-            <h2>Resumo</h2>
-            <div className="resumo-box color-box">
+            <h2>Resumo do seu Plano</h2>
+            <div className="resumo-box">
               <div className="resumo-item">
-                <i className="icon-trilha" /> <strong>Trilha escolhida:</strong>{" "}
-                {trilhaEscolhida}
+                <strong>Trilha escolhida:</strong>
+                <span>{trilhaEscolhida || "Nenhuma selecionada"}</span>
               </div>
               <div className="resumo-item">
-                <i className="icon-senioridade" />{" "}
-                <strong>Senioridade escolhida:</strong> {senioridadeEscolhida}
+                <strong>Senioridade:</strong>
+                <span>{senioridadeEscolhida || "Nenhuma selecionada"}</span>
               </div>
               <div className="resumo-item">
-                <i className="icon-dificuldade" />{" "}
-                <strong>Dificuldade escolhida:</strong> {dificuldadeEscolhida}
+                <strong>Dificuldade:</strong>
+                <span>{dificuldadeEscolhida || "Nenhuma selecionada"}</span>
               </div>
               <div className="resumo-item">
-                <i className="icon-dias" />{" "}
-                <strong>Dias escolhidos para estudo:</strong>{" "}
-                {diasEscolhidos.join(", ")}
+                <strong>Dias de estudo:</strong>
+                <span>{diasEscolhidos.length > 0 ? diasEscolhidos.join(", ") : "Nenhum selecionado"}</span>
               </div>
             </div>
 
             {todosCamposSelecionados && (
               <div className="botao-container">
-                <button className="botao-confirmar" onClick={handleConfirmar}>
-                  {isSubmitted ? "Enviado!" : "Confirmar!"}
+                <button
+                  className={`botao-confirmar ${isSubmitted ? "loading" : ""}`}
+                  onClick={handleConfirmar}
+                  disabled={isSubmitted}
+                >
+                  {isSubmitted ? "Enviando..." : "Confirmar!"}
                 </button>
               </div>
             )}

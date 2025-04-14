@@ -28,6 +28,7 @@ export function Navbar({ variant }) {
               <li><Link to="/" className="navbar-link">Home</Link></li>
               <li><Link to="/sobre" className="navbar-link">Sobre</Link></li>
               <li><Link to="/login" className="navbar-button">Entrar</Link></li>
+              <li><Link to="/cadastro" className="navbar-signup">Criar conta</Link></li>
             </>
           )}
         </ul>

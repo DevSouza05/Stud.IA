@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Drawer,
   List,
@@ -10,415 +10,744 @@ import {
   Box,
   MenuItem,
   InputAdornment,
+  Alert,
+  Snackbar,
+  CircularProgress,
+  Grid,
+  Typography,
+  Chip,
+  FormControl,
+  InputLabel,
+  Select,
+  Autocomplete,
+  LinearProgress,
+  Tooltip,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { styled } from "@mui/material/styles";
-import { jsPDF } from "jspdf";
+import jsPDF from "jspdf";
+import { Document, Packer, Paragraph, TextRun } from 'docx';
+import { saveAs } from 'file-saver';
+import PropTypes from 'prop-types';
+import { templates } from './templates';
 
-const ProgressBar = ({ currentStep, totalSteps }) => {
-  const steps = Array.from({ length: totalSteps }, (_, index) => index + 1);
+// Definindo interfaces para os tipos
+interface FormData {
+  [key: string]: any;
+  name: string;
+  email: string;
+  phone: string;
+  location: string;
+  professionalObjective: string;
+  experience: Array<{
+    company?: string;
+    position?: string;
+    startDate?: string;
+    endDate?: string;
+    description?: string;
+  }>;
+  education: any[];
+  skills: string[];
+  languages: any[];
+  projects: any[];
+  certifications: any[];
+  interests: any[];
+  hobbies: any[];
+  professionalSummary?: string;
+}
+
+interface SnackbarState {
+  open: boolean;
+  message: string;
+  severity: 'success' | 'error' | 'info' | 'warning';
+}
+
+interface ProgressBarProps {
+  currentStep: number;
+  totalSteps: number;
+  onStepClick: (step: number) => void;
+}
+
+interface ErrorState {
+  [key: string]: string;
+}
+
+// Componente de barra de progresso estilizado
+const StyledProgressBar = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginBottom: theme.spacing(2),
+  '& .step': {
+    width: 20,
+    height: 20,
+    borderRadius: '50%',
+    margin: '0 8px',
+    transition: 'all 0.3s ease',
+    cursor: 'pointer',
+    '&:hover': {
+      transform: 'scale(1.1)',
+    },
+  },
+}));
+
+const ProgressBar = ({ currentStep, totalSteps, onStepClick }: ProgressBarProps) => {
+  const steps: number[] = [];
+  for (let i = 1; i <= totalSteps; i++) {
+    steps.push(i);
+  }
   return (
-    <Box display="flex" justifyContent="center" alignItems="center" mb={2}>
+    <StyledProgressBar>
       {steps.map((step) => (
         <Box
           key={step}
+          className="step"
+          onClick={() => onStepClick(step)}
           sx={{
-            width: 20,
-            height: 20,
-            borderRadius: "50%",
-            backgroundColor: step <= currentStep ? "primary.main" : "grey.500",
-            margin: "0 8px",
+            backgroundColor: step <= currentStep ? 'primary.main' : 'grey.500',
           }}
+          role="button"
+          aria-label={`Ir para etapa ${step}`}
+          tabIndex={0}
         />
       ))}
-    </Box>
+    </StyledProgressBar>
   );
 };
 
-export default function DrawerMenu() {
+ProgressBar.propTypes = {
+  currentStep: PropTypes.number.isRequired,
+  totalSteps: PropTypes.number.isRequired,
+  onStepClick: PropTypes.func.isRequired,
+};
+
+const DrawerMenu = () => {
   const [open, setOpen] = useState(false);
-  const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
+  const [selectedTemplate, setSelectedTemplate] = useState(templates[0]);
+  const [formData, setFormData] = useState<FormData>({
+    name: '',
+    email: '',
+    phone: '',
+    location: '',
+    professionalObjective: '',
+    experience: [],
+    education: [],
     skills: [],
-    dob: "",
-    gender: "",
-    professionalObjective: "",
-    portfolioLink: "",
-    githubLink: "",
-    linkedinLink: "",
-    photo: null,
+    languages: [],
+    projects: [],
+    certifications: [],
+    interests: [],
+    hobbies: []
   });
 
-  const toggleDrawer = (state) => () => {
-    setOpen(state);
+  const [step, setStep] = useState<number>(1);
+  const [loading, setLoading] = useState(false);
+  const [snackbar, setSnackbar] = useState<SnackbarState>({ open: false, message: '', severity: 'success' });
+  const [errors, setErrors] = useState<ErrorState>({});
+
+  const skillOptions = [
+    "JavaScript", "TypeScript", "React", "Node.js", "Python", "Java", "C++", "SQL",
+    "Git", "Docker", "AWS", "Azure", "DevOps", "UI/UX", "Agile", "Scrum",
+    "Communication", "Leadership", "Problem Solving", "Team Work", "Time Management"
+  ];
+
+  const languageLevels = ["Básico", "Intermediário", "Avançado", "Fluente", "Nativo"];
+
+  const formatPhoneNumber = (value: string) => {
+    const numbers = value.replace(/\D/g, '');
+    if (numbers.length <= 11) {
+      return numbers.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+    }
+    return value;
   };
 
-  const handleNext = () => {
-    if (step === 2) {
-      if (!formData.name || !formData.email) {
-        alert('Nome e Email são obrigatórios!');
+  const validateField = (name: string, value: string) => {
+    switch (name) {
+      case 'name':
+        return !value ? 'Nome é obrigatório' : '';
+      case 'email':
+        return !value ? 'Email é obrigatório' : 
+               !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? 'Email inválido' : '';
+      case 'phone':
+        if (!value) return 'Telefone é obrigatório';
+        const numbers = value.replace(/\D/g, '');
+        if (numbers.length < 10 || numbers.length > 11) return 'Telefone inválido';
+        return '';
+      case 'professionalObjective':
+        return !value ? 'Objetivo profissional é obrigatório' : '';
+      case 'professionalSummary':
+        return !value ? 'Resumo profissional é obrigatório' : '';
+      default:
+        return '';
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    const formattedValue = name === 'phone' ? formatPhoneNumber(value) : value;
+    setFormData(prev => ({
+      ...prev,
+      [name]: formattedValue
+    }));
+    const error = validateField(name, formattedValue);
+    setErrors(prev => ({
+      ...prev,
+      [name]: error
+    }));
+  };
+
+  const handleArrayChange = (field: string, index: number, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: prev[field].map((item: any, i: number) => 
+        i === index ? { ...item, ...value } : item
+      )
+    }));
+  };
+
+  const addArrayItem = (field: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: [...prev[field], {}]
+    }));
+  };
+
+  const removeArrayItem = (field: string, index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: prev[field].filter((_, i: number) => i !== index)
+    }));
+  };
+
+  const handleTemplateChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const template = templates.find(t => t.name === event.target.value);
+    if (template) {
+      setSelectedTemplate(template);
+    }
+  };
+
+  const generateWordDocument = async () => {
+    try {
+      setLoading(true);
+      const doc = selectedTemplate.generate(formData);
+      const buffer = await Packer.toBlob(doc);
+      saveAs(buffer, `${formData.name.toLowerCase().replace(/\s+/g, '-')}-resume.docx`);
+      setSnackbar({
+        open: true,
+        message: 'Documento Word gerado com sucesso!',
+        severity: 'success'
+      });
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: 'Erro ao gerar documento Word',
+        severity: 'error'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const generatePDF = async () => {
+    try {
+      setLoading(true);
+      const doc = new jsPDF();
+      let y = 20;
+
+      // Nome
+      doc.setFontSize(24);
+      doc.setTextColor(33, 33, 33);
+      doc.text(formData.name, 20, y);
+      y += 10;
+
+      // Informações de contato
+      doc.setFontSize(12);
+      doc.setTextColor(117, 117, 117);
+      doc.text(`${formData.email} | ${formData.phone} | ${formData.location}`, 20, y);
+      y += 15;
+
+      // Objetivo Profissional
+      doc.setFontSize(16);
+      doc.setTextColor(33, 33, 33);
+      doc.text('Objetivo Profissional', 20, y);
+      y += 10;
+      doc.setFontSize(12);
+      doc.setTextColor(66, 66, 66);
+      doc.text(formData.professionalObjective, 20, y);
+      y += 15;
+
+      // Experiência
+      doc.setFontSize(16);
+      doc.setTextColor(33, 33, 33);
+      doc.text('Experiência Profissional', 20, y);
+      y += 10;
+
+      formData.experience.forEach(exp => {
+        doc.setFontSize(14);
+        doc.setTextColor(33, 33, 33);
+        doc.text(exp.position || '', 20, y);
+        y += 7;
+        doc.setFontSize(12);
+        doc.setTextColor(117, 117, 117);
+        doc.text(`${exp.company || ''} | ${exp.startDate || ''} - ${exp.endDate || ''}`, 20, y);
+        y += 7;
+        doc.setTextColor(66, 66, 66);
+        doc.text(exp.description || '', 20, y);
+        y += 15;
+      });
+
+      // Educação
+      if (formData.education.length > 0) {
+        doc.setFontSize(16);
+        doc.setTextColor(33, 33, 33);
+        doc.text('Educação', 20, y);
+        y += 10;
+
+        formData.education.forEach(edu => {
+          doc.setFontSize(14);
+          doc.setTextColor(33, 33, 33);
+          doc.text(edu.course || '', 20, y);
+          y += 7;
+          doc.setFontSize(12);
+          doc.setTextColor(117, 117, 117);
+          doc.text(`${edu.institution || ''} | ${edu.startDate || ''} - ${edu.endDate || ''}`, 20, y);
+          y += 15;
+        });
+      }
+
+      // Idiomas
+      if (formData.languages.length > 0) {
+        doc.setFontSize(16);
+        doc.setTextColor(33, 33, 33);
+        doc.text('Idiomas', 20, y);
+        y += 10;
+
+        formData.languages.forEach(lang => {
+          doc.setFontSize(12);
+          doc.setTextColor(66, 66, 66);
+          doc.text(`${lang.language || ''} - ${lang.level || ''}`, 20, y);
+          y += 7;
+        });
+      }
+
+      doc.save(`${formData.name.toLowerCase().replace(/\s+/g, '-')}-resume.pdf`);
+      setSnackbar({
+        open: true,
+        message: 'PDF gerado com sucesso!',
+        severity: 'success'
+      });
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: 'Erro ao gerar PDF',
+        severity: 'error'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStepClick = (newStep: number) => {
+    if (newStep < step) {
+      setStep(newStep);
+    } else if (newStep > step) {
+      // Validar campos da etapa atual antes de avançar
+      const currentStepFields = {
+        2: ['name', 'email'],
+        3: ['professionalObjective'],
+      }[step] || [];
+
+      const currentErrors = currentStepFields.reduce((acc, field) => {
+        const error = validateField(field, formData[field]);
+        return { ...acc, [field]: error };
+      }, {});
+
+      if (Object.values(currentErrors).some(error => error)) {
+        setErrors(currentErrors);
+        setSnackbar({
+          open: true,
+          message: 'Por favor, corrija os erros antes de avançar',
+          severity: 'error'
+        });
         return;
       }
+
+      setStep(newStep);
     }
-    setStep(step + 1);
   };
-  
-
-  const handleBack = () => {
-    setStep(step - 1);
-  };
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    setFormData({ ...formData, photo: file });
-  };
-
-  const handleSubmit = () => {
-    console.log(formData);
-    setStep(step + 1);
-  };
-
-  const generatePDF = () => {
-    const doc = new jsPDF();
-  
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(12);
-  
-    // Cabeçalho com o nome do usuário e título
-    doc.setFontSize(14);
-    doc.text("Currículo", 20, 30);
-  
-    // Linha separadora
-    doc.setLineWidth(0.5);
-    doc.line(20, 35, 190, 35);
-  
-    // Dados pessoais
-    doc.setFontSize(12);
-    doc.text("Dados Pessoais", 20, 45);
-    doc.setFontSize(10);
-    doc.text(`Nome: ${formData.name}`, 20, 55);
-    doc.text(`Email: ${formData.email}`, 20, 65);
-    doc.text(`Data de Nascimento: ${formData.dob}`, 20, 75);
-    doc.text(`Gênero: ${formData.gender}`, 20, 85);
-    
-    // Linha separadora
-    doc.line(20, 90, 190, 90);
-  
-    // Objetivo profissional
-    doc.setFontSize(12);
-    doc.text("Objetivo Profissional", 20, 100);
-    doc.setFontSize(10);
-    doc.text(formData.professionalObjective, 20, 110, { maxWidth: 170 });
-  
-    // Linha separadora
-    doc.line(20, 120, 190, 120);
-  
-    // Link de portfólio, GitHub, LinkedIn
-    doc.setFontSize(12);
-    doc.text("Links", 20, 130);
-    doc.setFontSize(10);
-    doc.text(`Portfólio: ${formData.portfolioLink}`, 20, 140);
-    doc.text(`GitHub: ${formData.githubLink}`, 20, 150);
-  
-    // Linha separadora
-    doc.line(20, 165, 190, 165);
-  
-    // Se houver foto, adicionar ao PDF
-    if (formData.photo) {
-      const img = URL.createObjectURL(formData.photo);
-      doc.addImage(img, "JPEG", 150, 40, 40, 40); // Adiciona a foto do perfil
-    }
-  
-    // Salvar o PDF
-    doc.save("curriculo_usuario.pdf");
-  };
-  
 
   return (
     <>
-      <IconButton color="inherit" onClick={toggleDrawer(true)}>
+      <IconButton
+        edge="start"
+        color="inherit"
+        aria-label="menu"
+        onClick={() => setOpen(true)}
+      >
         <MenuIcon />
       </IconButton>
 
       <Drawer
         anchor="right"
         open={open}
-        onClose={toggleDrawer(false)}
-        sx={{
-          "& .MuiDrawer-paper": {
-            width: 320,
-            backgroundImage: "linear-gradient(135deg, #1a0f47 0%, #13141d 50%, #283361 100%)",
-            color: "#fff",
-            padding: "16px",
-          },
+        onClose={() => setOpen(false)}
+        PaperProps={{
+          sx: { width: '100%', maxWidth: 600 }
         }}
       >
-        <ProgressBar currentStep={step} totalSteps={6} />
+        <Box sx={{ p: 3 }}>
+          <ProgressBar
+            currentStep={step}
+            totalSteps={6}
+            onStepClick={handleStepClick}
+          />
 
-        <List>
-          {/* Etapa 1: Tela inicial com botão "Começar" */}
           {step === 1 && (
-            <Box
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-              justifyContent="center"
-              textAlign="center"
-              height="10vh"
-            >
-              <ListItemText primary="Crie seu perfil!" primaryTypographyProps={{ variant: "h5", fontWeight: "bold" }} />
-              <Button onClick={handleNext} variant="contained" color="primary">
-                Começar
-              </Button>
-            </Box>
-          )}
-
-          {/* Etapa 2: Dados básicos - Nome e Email */}
-          {step === 2 && (
-            <Box display="flex" flexDirection="column" alignItems="center">
-              <TextField
-                label="Nome"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                sx={{
-                  fieldset: { borderColor: "#fff" },
-                  "& .MuiInputBase-input": {
-                    color: "#fff",
-                    fontSize: "1.2rem" 
-                  },
-                  "& .MuiInputLabel-root": { color: "#fff" }, 
-                }}
-                InputLabelProps={{
-                  shrink: true, 
-                }}
-              />
-              <TextField
-                label="Email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                sx={{
-                  fieldset: { borderColor: "#fff" }, 
-                  "& .MuiInputBase-input": {
-                    color: "#fff",
-                    fontSize: "1.2rem" 
-                  },
-                  "& .MuiInputLabel-root": { color: "#fff" },
-                }}
-                InputLabelProps={{
-                  shrink: true, 
-                }}
-              />
-              <Button onClick={handleNext} variant="contained" color="primary">
-                Próximo
-              </Button>
-            </Box>
-          )}
-
-
-
-          {/* Etapa 3: Informações adicionais */}
-          {step === 3 && (
-            <Box display="flex" flexDirection="column" alignItems="center">
-              <TextField
-                label="Data de Nascimento"
-                name="dob"
-                type="date"
-                value={formData.dob}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                sx={{
-                  fieldset: { borderColor: "#fff" }, 
-                  "& .MuiInputBase-input": { color: "#fff" },
-                  "& .MuiInputLabel-root": { color: "#fff" }, 
-                }}
-                InputLabelProps={{
-                  shrink: true, 
-                }}
-              />
-              <TextField
-                label="Gênero"
-                name="gender"
-                select
-                value={formData.gender}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                sx={{
-                  fieldset: { borderColor: "#fff" },
-                  "& .MuiInputBase-input": { color: "#fff" },
-                  "& .MuiInputLabel-root": { color: "#fff" },
-                }}
-              >
-                <MenuItem value="masculino">Masculino</MenuItem>
-                <MenuItem value="feminino">Feminino</MenuItem>
-                <MenuItem value="outro">Outro</MenuItem>
-              </TextField>
-              <TextField
-                label="Objetivo Profissional"
-                name="professionalObjective"
-                value={formData.professionalObjective}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                sx={{
-                  fieldset: { borderColor: "#fff" },
-                  "& .MuiInputBase-input": { color: "#fff" },
-                  "& .MuiInputLabel-root": { color: "#fff" },
-                }}
-              />
-              <Box display="flex" justifyContent="center" width="100%" mt={2}>
-                <Button onClick={handleBack} variant="contained" color="secondary">
-                  Voltar
-                </Button>
-                <Button
-                  onClick={handleNext}
-                  variant="contained"
-                  color="primary"
-                  sx={{ marginLeft: "8px" }}
-                >
-                  Próximo
-                </Button>
-              </Box>
-            </Box>
-          )}
-
-          {/* Etapa 4: Links do Portfólio, GitHub e LinkedIn */}
-          {step === 4 && (
             <Box>
-              <TextField
-                label="Link do Linkedin"
-                name="portfolioLink"
-                value={formData.portfolioLink}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                sx={{
-                  fieldset: { borderColor: "#fff" },
-                  "& .MuiInputBase-input": { color: "#fff" },
-                  "& .MuiInputLabel-root": { color: "#fff" },
-                }}
-
-                InputProps={{
-                  style: { color: "#fff" },
-                }}
-                InputLabelProps={{
-                  style: { color: "#fff" },
-                }}
-              />
-              <TextField
-                label="Link do GitHub"
-                name="githubLink"
-                value={formData.githubLink}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                sx={{
-                  fieldset: { borderColor: "#fff" },
-                  "& .MuiInputBase-input": { color: "#fff" },
-                  "& .MuiInputLabel-root": { color: "#fff" },
-                }}
-                InputProps={{
-                  style: { color: "#fff" },
-                }}
-                InputLabelProps={{
-                  style: { color: "#fff" },
-                }}
-              />
-              <Button onClick={handleBack} variant="contained" color="secondary">
-                Voltar
-              </Button>
-              <Button onClick={handleNext} variant="contained" color="primary" sx={{ marginLeft: "8px" }}>
-                Próximo
-              </Button>
-            </Box>
-          )}
-
-
-          {/* Etapa 5: Carregar foto */}
-          {step === 5 && (
-            <Box>
-              <Box mt={2} display="flex" justifyContent="center" width="100%">
-                <input
-                  accept="image/*"
-                  style={{ display: "none" }}
-                  id="photo-upload"
-                  type="file"
-                  onChange={handleFileChange}
-                />
-                <label htmlFor="photo-upload">
-                  <Button component="span" variant="contained" color="primary">
-                    Carregar Foto
-                  </Button>
-                </label>
-              </Box>
-              {formData.photo && (
-                <Box mt={2} display="flex" justifyContent="center" width="100%">
-                  <img
-                    src={URL.createObjectURL(formData.photo)}
-                    alt="Foto do Perfil"
-                    style={{ width: "100px", height: "100px", borderRadius: "50%" }}
+              <Typography variant="h6" gutterBottom>
+                Informações Pessoais
+              </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Box>
+                  <TextField
+                    fullWidth
+                    label="Nome Completo"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    error={!!errors.name}
+                    helperText={errors.name}
                   />
                 </Box>
-              )}
-              <Box display="flex" justifyContent="center" width="100%" mt={2}>
-                <Button onClick={handleBack} variant="contained" color="secondary">
-                  Voltar
-                </Button>
-                <Button onClick={handleSubmit} variant="contained" color="primary" sx={{ marginLeft: "8px" }}>
-                  Finalizar
+                <Box>
+                  <TextField
+                    fullWidth
+                    label="Email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    error={!!errors.email}
+                    helperText={errors.email}
+                  />
+                </Box>
+                <Box>
+                  <TextField
+                    fullWidth
+                    label="Telefone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    error={!!errors.phone}
+                    helperText={errors.phone}
+                    placeholder="(00) 00000-0000"
+                  />
+                </Box>
+                <Box>
+                  <TextField
+                    fullWidth
+                    label="Localização"
+                    name="location"
+                    value={formData.location}
+                    onChange={handleChange}
+                    placeholder="Cidade, Estado"
+                  />
+                </Box>
+              </Box>
+            </Box>
+          )}
+
+          {step === 2 && (
+            <Box>
+              <Typography variant="h6" gutterBottom>
+                Experiência Profissional
+              </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {formData.experience.map((exp, index) => (
+                  <Box key={index} sx={{ mb: 2, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      <TextField
+                        fullWidth
+                        label="Empresa"
+                        value={exp.company || ''}
+                        onChange={(e) => handleArrayChange('experience', index, { company: e.target.value })}
+                      />
+                      <TextField
+                        fullWidth
+                        label="Cargo"
+                        value={exp.position || ''}
+                        onChange={(e) => handleArrayChange('experience', index, { position: e.target.value })}
+                      />
+                      <Box sx={{ display: 'flex', gap: 2 }}>
+                        <TextField
+                          fullWidth
+                          label="Data de Início"
+                          type="date"
+                          value={exp.startDate || ''}
+                          onChange={(e) => handleArrayChange('experience', index, { startDate: e.target.value })}
+                          InputLabelProps={{ shrink: true }}
+                        />
+                        <TextField
+                          fullWidth
+                          label="Data de Término"
+                          type="date"
+                          value={exp.endDate || ''}
+                          onChange={(e) => handleArrayChange('experience', index, { endDate: e.target.value })}
+                          InputLabelProps={{ shrink: true }}
+                        />
+                      </Box>
+                      <TextField
+                        fullWidth
+                        multiline
+                        rows={3}
+                        label="Descrição das Atividades"
+                        value={exp.description || ''}
+                        onChange={(e) => handleArrayChange('experience', index, { description: e.target.value })}
+                      />
+                    </Box>
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      onClick={() => removeArrayItem('experience', index)}
+                      sx={{ mt: 1 }}
+                    >
+                      Remover Experiência
+                    </Button>
+                  </Box>
+                ))}
+                <Button
+                  variant="contained"
+                  onClick={() => addArrayItem('experience')}
+                  sx={{ mt: 2 }}
+                >
+                  Adicionar Experiência
                 </Button>
               </Box>
             </Box>
           )}
 
-
-
-          {/* Etapa 6: Perfil finalizado */}
-          {step === 6 && (
+          {step === 3 && (
             <Box>
-              <ListItemText primary="Perfil finalizado!" />
-              <ListItemText primary={`Nome: ${formData.name}`} />
-              <ListItemText primary={`Email: ${formData.email}`} />
-              <ListItemText primary={`Data de Nascimento: ${formData.dob}`} />
-              <ListItemText primary={`Gênero: ${formData.gender}`} />
-              <ListItemText primary={`Objetivo: ${formData.professionalObjective}`} />
-              <ListItemText primary={`Link do Portfólio: ${formData.portfolioLink}`} />
-              <ListItemText primary={`GitHub: ${formData.githubLink}`} />
-              <ListItemText primary={`LinkedIn: ${formData.linkedinLink}`} />
-              {formData.photo && (
-                <img
-                  src={URL.createObjectURL(formData.photo)}
-                  alt="Foto do Perfil"
-                  style={{ width: "100px", height: "100px", borderRadius: "50%" }}
+              <Typography variant="h6" gutterBottom>
+                Habilidades e Competências
+              </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Autocomplete
+                  multiple
+                  options={skillOptions}
+                  value={formData.skills}
+                  onChange={(_, newValue) => {
+                    setFormData(prev => ({
+                      ...prev,
+                      skills: newValue
+                    }));
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Habilidades Técnicas"
+                      placeholder="Adicione suas habilidades"
+                    />
+                  )}
+                  renderTags={(value, getTagProps) =>
+                    value.map((option, index) => (
+                      <Chip
+                        label={option}
+                        {...getTagProps({ index })}
+                        key={option}
+                      />
+                    ))
+                  }
                 />
-              )}
-              <Button onClick={toggleDrawer(false)} variant="contained" color="primary">
-                Fechar
-              </Button>
-              <Button onClick={() => setStep(2)} variant="contained" color="secondary" sx={{ marginLeft: "8px" }}>
-                Editar Perfil
-              </Button>
-
-              <Button onClick={(generatePDF)} variant="contained" color="secondary" sx={{ marginLeft: "8px" }}>
-                PDF
-              </Button>
+              </Box>
             </Box>
           )}
-        </List>
+
+          {step === 4 && (
+            <Box>
+              <Typography variant="h6" gutterBottom>
+                Resumo e Objetivos
+              </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <TextField
+                  fullWidth
+                  multiline
+                  rows={4}
+                  label="Resumo Profissional"
+                  name="professionalSummary"
+                  value={formData.professionalSummary}
+                  onChange={handleChange}
+                  error={!!errors.professionalSummary}
+                  helperText={errors.professionalSummary}
+                />
+              </Box>
+            </Box>
+          )}
+
+          {step === 5 && (
+            <Box>
+              <Typography variant="h6" gutterBottom>
+                Educação
+              </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {formData.education.map((edu, index) => (
+                  <Box key={index} sx={{ mb: 2, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      <TextField
+                        fullWidth
+                        label="Instituição"
+                        value={edu.institution || ''}
+                        onChange={(e) => handleArrayChange('education', index, { institution: e.target.value })}
+                      />
+                      <TextField
+                        fullWidth
+                        label="Curso"
+                        value={edu.course || ''}
+                        onChange={(e) => handleArrayChange('education', index, { course: e.target.value })}
+                      />
+                      <Box sx={{ display: 'flex', gap: 2 }}>
+                        <TextField
+                          fullWidth
+                          label="Data de Início"
+                          type="date"
+                          value={edu.startDate || ''}
+                          onChange={(e) => handleArrayChange('education', index, { startDate: e.target.value })}
+                          InputLabelProps={{ shrink: true }}
+                        />
+                        <TextField
+                          fullWidth
+                          label="Data de Término"
+                          type="date"
+                          value={edu.endDate || ''}
+                          onChange={(e) => handleArrayChange('education', index, { endDate: e.target.value })}
+                          InputLabelProps={{ shrink: true }}
+                        />
+                      </Box>
+                    </Box>
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      onClick={() => removeArrayItem('education', index)}
+                      sx={{ mt: 1 }}
+                    >
+                      Remover Educação
+                    </Button>
+                  </Box>
+                ))}
+                <Button
+                  variant="contained"
+                  onClick={() => addArrayItem('education')}
+                  sx={{ mt: 2 }}
+                >
+                  Adicionar Educação
+                </Button>
+              </Box>
+            </Box>
+          )}
+
+          {step === 6 && (
+            <Box>
+              <Typography variant="h6" gutterBottom>
+                Idiomas
+              </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {formData.languages.map((lang, index) => (
+                  <Box key={index} sx={{ mb: 2, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      <TextField
+                        fullWidth
+                        label="Idioma"
+                        value={lang.language || ''}
+                        onChange={(e) => handleArrayChange('languages', index, { language: e.target.value })}
+                      />
+                      <FormControl fullWidth>
+                        <InputLabel>Nível</InputLabel>
+                        <Select
+                          value={lang.level || ''}
+                          label="Nível"
+                          onChange={(e) => handleArrayChange('languages', index, { level: e.target.value })}
+                        >
+                          {languageLevels.map((level) => (
+                            <MenuItem key={level} value={level}>
+                              {level}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Box>
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      onClick={() => removeArrayItem('languages', index)}
+                      sx={{ mt: 1 }}
+                    >
+                      Remover Idioma
+                    </Button>
+                  </Box>
+                ))}
+                <Button
+                  variant="contained"
+                  onClick={() => addArrayItem('languages')}
+                  sx={{ mt: 2 }}
+                >
+                  Adicionar Idioma
+                </Button>
+              </Box>
+            </Box>
+          )}
+
+          <Box sx={{ mt: 3, display: 'flex', justifyContent: 'space-between' }}>
+            <Button
+              variant="contained"
+              onClick={() => setStep(prev => Math.max(1, prev - 1))}
+              disabled={step === 1}
+            >
+              Anterior
+            </Button>
+            <Box>
+              <Button
+                variant="contained"
+                onClick={generatePDF}
+                sx={{ mr: 1 }}
+                disabled={loading}
+              >
+                {loading ? <CircularProgress size={24} /> : 'Baixar PDF'}
+              </Button>
+              <Button
+                variant="contained"
+                onClick={generateWordDocument}
+                sx={{ mr: 1 }}
+                disabled={loading}
+              >
+                {loading ? <CircularProgress size={24} /> : 'Baixar Word'}
+              </Button>
+              <Button
+                variant="contained"
+                onClick={() => setStep(prev => Math.min(6, prev + 1))}
+                disabled={step === 6}
+              >
+                Próximo
+              </Button>
+            </Box>
+          </Box>
+        </Box>
       </Drawer>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+      >
+        <Alert
+          onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </>
   );
-}
+};
+
+export default DrawerMenu;

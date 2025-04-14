@@ -1,32 +1,63 @@
+/* Reset e Base */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(135deg, #1a0f47 0%, #13141d 50%, #283361 100%);
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  position: relative;
+}
+
+body {
+  display: block !important;
+  position: relative;
+}
+
+#root {
+  min-height: 100%;
+  position: relative;
+  overflow-y: auto;
+}
+
 /* Base e Containers */
 .home-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #1a0f47 0%, #13141d 50%, #283361 100%);
+  width: 100%;
+  min-height: 100%;
+  height: auto;
+  position: relative;
   padding: 20px;
-  padding-top: 80px;
+  padding-top: 100px;
+  padding-bottom: 40px;
+  box-sizing: border-box;
+  color: rgba(255, 255, 255, 0.9);
   font-family: 'Poppins', 'Arial', sans-serif;
-  color: #333;
   font-size: 16px;
+  overflow-y: auto;
 }
 
 .main-content {
-  width: 100%;
-  max-width: 900px;
-  text-align: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  position: relative;
+  height: auto;
+  overflow-y: visible;
 }
 
 /* Cabeçalhos */
-.home-container h1 {
+h1 {
   color: white;
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 5px;
+  background: linear-gradient(45deg, #fff, #4facfe);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.home-container h2 {
+h2 {
   color: rgba(255, 255, 255, 0.9);
   font-size: 1.4rem;
   font-weight: 400;
@@ -36,185 +67,149 @@
 
 /* Card principal */
 .card {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 25px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  margin-top: 20px;
-  position: relative; /* Para posicionamento dos botões de navegação */
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .card h2 {
-  color: #2a5298;
+  color: #4facfe;
   font-size: 1.8rem;
   margin-bottom: 20px;
-  text-shadow: none;
 }
 
-/* Barra de progresso */
+/* Roadmap Section */
+.roadmap-section {
+  margin-top: 30px;
+  overflow: visible;
+  height: auto;
+}
+
+.roadmap-content {
+  margin-top: 30px;
+  transition: opacity 0.3s ease;
+}
+
+.roadmap-content.transitioning {
+  opacity: 0;
+}
+
+/* Content Grid */
+.content-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 30px;
+  margin-top: 30px;
+  height: auto;
+  min-height: min-content;
+}
+
+/* Seções */
+.section {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.section h4 {
+  color: #4facfe;
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+}
+
+.section p {
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.6;
+}
+
+/* Progress Bars */
 .progress-container {
   width: 100%;
-  height: 28px;
-  background: #f5f7fa;
-  border-radius: 14px;
+  height: 20px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  margin: 20px 0;
   overflow: hidden;
-  margin: 20px 0 30px;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-  position: relative;
 }
 
 .progress-bar {
   height: 100%;
-  background: linear-gradient(to right, #4facfe, #00f2fe);
-  border-radius: 14px;
-  transition: width 0.6s cubic-bezier(0.65, 0, 0.35, 1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: linear-gradient(90deg, #4facfe, #00f2fe);
+  transition: width 0.3s ease;
+  position: relative;
 }
 
 .progress-text {
+  position: absolute;
+  right: 10px;
   color: white;
-  font-weight: 600;
-  font-size: 15px;
+  font-size: 12px;
+  line-height: 20px;
 }
 
-/* Controladores de Paginação */
+/* Pagination Controls */
 .pagination-controls {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  margin: 20px 0 10px;
+  gap: 20px;
+  margin: 20px 0;
 }
 
 .pagination-button {
-  background: #2a5298;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 48px;
-  height: 48px;
-  font-size: 24px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 8px;
+  background: transparent;
+  color: white;
+  border: 2px solid #4facfe;
+  padding: 10px 20px;
+  border-radius: 25px;
   cursor: pointer;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
   transition: all 0.3s ease;
+  font-size: 1rem;
 }
 
 .pagination-button:hover {
-  background: #1e3c72;
+  background: rgba(79, 172, 254, 0.1);
   transform: translateY(-2px);
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 
 .pagination-button:disabled {
-  background: #b0bec5;
+  opacity: 0.5;
   cursor: not-allowed;
   transform: none;
-  box-shadow: none;
 }
 
-.pagination-indicator {
-  font-weight: 600;
-  font-size: 1.1rem;
-  color: #455a64;
-}
-
-/* Contador de módulos */
 .module-counter {
-  padding: 5px 15px;
-  background: #e3f2fd;
-  border-radius: 20px;
-  color: #2a5298;
-  font-weight: 600;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-/* Container do Roadmap - Agora para paginação */
-.roadmap-container {
-  position: relative;
-  width: 100%;
-  overflow-x: hidden;
-}
-
-/* Animação para troca de itens */
-.roadmap-item {
-  background: #ffffff;
-  padding: 22px;
-  border-radius: 12px;
-  border-left: 5px solid #4facfe;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-  text-align: left;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  animation: fadeIn 0.5s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.roadmap-item:hover {
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-}
-
-.roadmap-item h3 {
-  color: #2a5298;
-  font-size: 1.4rem;
-  margin-bottom: 15px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #eaeef2;
-}
-
-/* Organização em duas colunas dentro dos itens */
-.roadmap-content {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px;
-}
-
-/* Seções dentro dos itens - Simplificadas */
-.section {
-  margin-bottom: 18px;
-  background: #f8fafc;
-  padding: 15px;
-  border-radius: 8px;
-}
-
-.section h4 {
-  color: #455a64;
   font-size: 1.1rem;
-  margin: 0 0 10px 0;
-  border-bottom: 1px solid #eaeef2;
-  padding-bottom: 8px;
+  color: rgba(255, 255, 255, 0.9);
 }
 
-.section ul {
-  list-style-type: none;
+/* Submódulos */
+.submodules-list {
+  list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.section ul li {
-  padding: 6px 0;
-  color: #546e7a;
-  font-size: 1.05rem;
-}
-
-.section p {
-  color: #546e7a;
-  margin: 8px 0;
-  font-size: 1.05rem;
-  line-height: 1.5;
-}
-
-/* Submódulos com checkbox - Simplificados */
 .submodule-item {
-  margin: 10px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.submodule-item:hover {
+  background: rgba(79, 172, 254, 0.05);
 }
 
 .submodule-item label {
@@ -222,125 +217,218 @@
   align-items: center;
   gap: 10px;
   cursor: pointer;
-  padding: 6px;
+  width: 100%;
 }
 
 .submodule-item input[type="checkbox"] {
-  margin: 0;
   width: 18px;
   height: 18px;
-  cursor: pointer;
+  accent-color: #4facfe;
 }
 
 .submodule-item span {
-  font-size: 1.05rem;
+  color: rgba(255, 255, 255, 0.9);
 }
 
-.completed {
+.submodule-item span.completed {
+  color: #4facfe;
   text-decoration: line-through;
-  color: #90a4ae;
 }
 
-/* Loading spinner */
-.loading-spinner {
-  width: 50px;
-  height: 50px;
-  border: 4px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  border-top: 4px solid #ffffff;
-  animation: spin 1s linear infinite;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+/* Links */
+.material-link {
+  color: #4facfe;
+  text-decoration: none;
+  margin-left: 8px;
+  transition: color 0.3s ease;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+.material-link:hover {
+  color: #00f2fe;
 }
 
 /* Mensagens */
 .error-message {
   color: #f44336;
-  padding: 12px;
-  background: #ffebee;
-  border-radius: 6px;
-  margin: 15px 0;
-  font-size: 1.05rem;
-}
-
-/* Ocultar seções menos importantes por padrão */
-.section.secondary {
-  display: none;
+  margin: 10px 0;
+  padding: 10px;
+  background-color: #ffebee;
+  border-radius: 4px;
 }
 
 /* Botão para mostrar/ocultar mais informações */
 .toggle-details {
-  display: block;
-  width: 100%;
-  background: #f0f4f8;
+  background: none;
   border: none;
-  border-radius: 6px;
-  padding: 10px;
-  margin-top: 12px;
-  color: #4a6572;
-  font-weight: 500;
-  font-size: 1rem;
+  color: #4CAF50;
   cursor: pointer;
-  transition: background 0.2s;
+  padding: 5px 0;
+  font-size: 14px;
+  transition: color 0.3s;
 }
 
 .toggle-details:hover {
-  background: #e1e7ec;
+  color: #388E3C;
 }
 
-/* Links para materiais */
-.material-link {
-  color: #2196f3;
-  text-decoration: none;
-  margin-left: 5px;
-  font-size: 1.05rem;
+/* Tooltip */
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  background-color: #333;
+  color: white;
+  text-align: center;
+  padding: 5px 10px;
+  border-radius: 6px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.tooltip:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Indicador de progresso por seção */
+.section-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.section-progress-bar {
+  flex: 1;
+  height: 8px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.section-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4CAF50, #8BC34A);
+  transition: width 0.3s ease;
 }
 
 /* Mensagem para telas vazias */
 .empty-message {
   text-align: center;
-  padding: 30px;
-  color: #78909c;
+  color: #666;
+  padding: 20px;
+}
+
+
+/* Container de Carregamento */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 100px); /* Ajusta para ocupar a altura da tela, menos o espaço da navbar */
+  text-align: center;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Círculo de Carregamento */
+.loading-circle {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(255, 255, 255, 0.2);
+  border-top: 5px solid #4facfe;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+/* Animação do Círculo de Carregamento */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Estilização do Nome do Usuário */
+.user-name {
+  font-weight: 600;
+  background: linear-gradient(45deg, #4facfe, #00f2fe);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Texto de Carregamento */
+.loading-container p {
   font-size: 1.2rem;
-  background: rgba(255, 255, 255, 0.8);
-  border-radius: 10px;
-  margin: 20px 0;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
 }
 
 /* Responsividade */
 @media (max-width: 768px) {
-  .roadmap-content {
+  body {
+    overflow-y: auto !important;
+  }
+
+  .home-container {
+    padding: 10px;
+    padding-top: 80px;
+    height: auto;
+    min-height: 100%;
+  }
+
+  .content-grid {
     grid-template-columns: 1fr;
   }
-  
-  .home-container {
-    padding: 15px;
-    padding-top: 70px;
-    font-size: 15px;
-  }
-  
+
   .card {
-    padding: 18px;
+    padding: 20px;
   }
-  
-  .home-container h1 {
-    font-size: 2.2rem;
+
+  .section {
+    padding: 15px;
   }
-  
-  .home-container h2 {
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  h2 {
     font-size: 1.2rem;
   }
-  
+}
+
+@media (max-width: 480px) {
+  .home-container {
+    padding: 5px;
+    padding-top: 70px;
+    height: auto;
+  }
+
+  .card {
+    padding: 15px;
+  }
+
+  .pagination-controls {
+    flex-direction: column;
+    gap: 10px;
+  }
+
   .pagination-button {
-    width: 40px;
-    height: 40px;
-    font-size: 20px;
+    width: 100%;
+    justify-content: center;
   }
 }

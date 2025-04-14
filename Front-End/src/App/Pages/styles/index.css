@@ -24,10 +24,11 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
+  padding: 0;
   min-width: 320px;
-  min-height: 100vh;
+  overflow-y: auto !important;
+  position: relative;
+  display: block !important;
   color: #6e1bdb;
 }
 
@@ -163,5 +164,12 @@ h1{
 .loading-message {
   text-align: center;
   color: #888;
+}
+
+#root {
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  overflow-y: auto;
 }
 

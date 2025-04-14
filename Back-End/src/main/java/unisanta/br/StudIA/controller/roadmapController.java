@@ -1,5 +1,10 @@
 package unisanta.br.StudIA.controller;
+
+import com.alibaba.fastjson.JSON;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,18 +20,19 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RestController
 @CrossOrigin(origins = "*")
-
 @RequestMapping("/api/v1/")
 public class roadmapController {
+
+    private static final Logger logger = LoggerFactory.getLogger(roadmapController.class);
 
     private final OpenAIService openAIService;
     private final UserService userService;
     private final SelecaoService selecaoService;
-
 
     public roadmapController(OpenAIService openAIService, UserService userService, SelecaoService selecaoService) {
         this.openAIService = openAIService;
@@ -34,63 +40,87 @@ public class roadmapController {
         this.selecaoService = selecaoService;
     }
 
-
     @PostMapping("/roadmap")
     public ResponseEntity<Map<String, Object>> createRoadmap(@Valid @RequestBody SelecaoDTO selecaoDTO) {
+        try {
+            logger.info("Recebida requisição para criar roadmap: {}", selecaoDTO);
 
-        Optional<Users> optionalUser = Optional.ofNullable(userService.getUserById(selecaoDTO.userID()));
-        if (optionalUser.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("message", "Usuário não encontrado"));
+            if (selecaoDTO.userID() == null) {
+                logger.warn("userID nulo recebido");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("message", "userID é obrigatório"));
+            }
+
+            Optional<Users> optionalUser = Optional.ofNullable(userService.getUserById(selecaoDTO.userID()));
+            if (optionalUser.isEmpty()) {
+                logger.warn("Usuário não encontrado para userID: {}", selecaoDTO.userID());
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("message", "Usuário não encontrado"));
+            }
+            Users user = optionalUser.get();
+
+            if (selecaoDTO.selecoes() == null || selecaoDTO.selecoes().isEmpty()) {
+                logger.warn("Nenhuma seleção fornecida para userID: {}", selecaoDTO.userID());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("message", "Pelo menos uma seleção é obrigatória"));
+            }
+
+            Selecao selecao = selecaoDTO.mapearSelecao(user);
+            selecaoService.saveSelecao(selecao);
+            logger.info("Seleção salva com sucesso para userID: {}", selecaoDTO.userID());
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("message", "Roadmap criado com sucesso");
+            response.put("usuario", selecao.getUsuario());
+            response.put("itens", selecao.getSelecoes());
+
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+
+        } catch (IllegalArgumentException e) {
+            logger.error("Erro de validação ao processar roadmap: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Dados inválidos: " + e.getMessage()));
+        } catch (Exception e) {
+            logger.error("Erro interno ao processar roadmap para userID: {}", selecaoDTO.userID(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Erro interno no servidor: " + e.getMessage()));
         }
-        Users user = optionalUser.get();
-
-
-        Selecao selecao = selecaoDTO.mapearSelecao(user);
-
-        selecaoService.saveSelecao(selecao);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("status", "success");
-        response.put("message", "Roadmap criado com sucesso");
-        response.put("usuario", selecao.getUsuario());
-        response.put("Itens", selecao.getSelecoes());
-
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.put("Seleções", response);
-
-        return ResponseEntity.status(HttpStatus.OK).body(responseMap);
-
     }
 
     @GetMapping("/roadmap/{id}")
-    public Mono<ResponseEntity<Map<String, String>>> generateRoadmap(@PathVariable Long id) {
-        Users user = userService.getUserById(id);
+    @Cacheable(value = "roadmaps", key = "#id")
+    public Mono<ResponseEntity<?>> generateRoadmap(@PathVariable Long id) {
+        logger.info("Recebida requisição para gerar roadmap para userID: {}", id);
 
+        Users user = userService.getUserById(id);
         if (user == null) {
-            return Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("message", "Usuário não encontrado")));
+            logger.warn("Usuário não encontrado para userID: {}", id);
+            return Mono.just(new ResponseEntity<>(Map.of("message", "Usuário não encontrado"), HttpStatus.NOT_FOUND));
         }
 
         Selecao selecao = selecaoService.getSelecaoByUserId(id);
         if (selecao == null) {
-            return Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("message", "Seleção não encontrada para o usuário")));
+            logger.warn("Seleção não encontrada para userID: {}", id);
+            return Mono.just(new ResponseEntity<>(Map.of("message", "Seleção não encontrada para o usuário"), HttpStatus.NOT_FOUND));
         }
-
 
         String roadmapSalvo = selecao.getRoadmap();
-        if (roadmapSalvo != null){
-            return Mono.just(ResponseEntity.ok(Map.of("roadmap", roadmapSalvo)));
+        if (roadmapSalvo != null) {
+            logger.info("Roadmap existente retornado para userID: {}", id);
+            try {
+                Object parsedResponse = JSON.parseArray(roadmapSalvo);
+                return Mono.just(ResponseEntity.ok(parsedResponse));
+            } catch (Exception e) {
+                logger.error("Erro ao parsear roadmap salvo para userID: {}", id, e);
+                return Mono.just(new ResponseEntity<>(Map.of("message", "Erro ao processar roadmap salvo: " + e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR));
+            }
         }
-
-
 
         String conteudo = String.join(", ", selecao.getSelecoes());
         String prompt = "Com base nas seguintes seleções: " + conteudo +
-                ", crie um roadmap de estudos personalizado em formato JSON puro, otimizado para manipulação por um frontend, sem texto adicional, formatação Markdown ou comentários explicativos. " +
-                "Siga as diretrizes abaixo para estruturar um planejamento eficiente, realista e detalhado: " +
-
+                ", crie um roadmap de estudos personalizado em formato JSON puro, sem Markdown, texto adicional ou comentários explicativos. " +
+                "Siga as diretrizes abaixo: " +
                 "1. **Estrutura do JSON:** " +
                 "   - Retorne um array de objetos, onde cada objeto representa um tópico ou módulo de estudo, com os campos: " +
                 "     - 'titulo': Nome do tópico ou módulo (string); " +
@@ -163,16 +193,52 @@ public class roadmapController {
 
         return openAIService.gerarResposta(prompt)
                 .flatMap(response -> {
-                    selecaoService.salvarRoadmap(id, response);
-                    return Mono.just(ResponseEntity.ok(Map.of("roadmap", response)));
+                    try {
+                        logger.debug("Resposta bruta da API Gemini para userID {}: {}", id, response);
+
+                        // Verifica se a resposta contém um erro da API Gemini
+                        if (response.contains("Erro ao processar resposta do Gemini") || response.contains("Erro ao chamar a API do Gemini")) {
+                            throw new IllegalStateException("API Gemini retornou um erro: " + response);
+                        }
+
+                        // Tenta extrair JSON de um bloco Markdown
+                        Pattern jsonPattern = Pattern.compile("(?s)```json\\n(.*?)\\n```");
+                        Matcher matcher = jsonPattern.matcher(response);
+                        String jsonString;
+
+                        if (matcher.find()) {
+                            jsonString = matcher.group(1);
+                            logger.debug("JSON extraído de bloco Markdown para userID {}: {}", id, jsonString);
+                        } else {
+                            // Se não houver Markdown, usa a resposta direta
+                            jsonString = response.trim();
+                            logger.debug("Nenhum bloco Markdown encontrado, usando resposta direta para userID {}: {}", id, jsonString);
+                        }
+
+                        // Validação adicional para garantir que a string seja um JSON válido
+                        if (!jsonString.startsWith("[") || !jsonString.endsWith("]")) {
+                            throw new IllegalStateException("Resposta não é um array JSON válido: " + jsonString);
+                        }
+
+                        // Tenta parsear o JSON como um array
+                        Object parsedResponse = JSON.parseArray(jsonString);
+                        if (parsedResponse == null) {
+                            throw new IllegalStateException("JSON parseado resultou em null: " + jsonString);
+                        }
+
+                        selecaoService.salvarRoadmap(id, jsonString);
+                        logger.info("Roadmap gerado e salvo para userID: {}", id);
+                        return Mono.just(ResponseEntity.ok(parsedResponse));
+                    } catch (Exception e) {
+                        logger.error("Erro ao processar resposta da IA para userID: {}", id, e);
+                        Map<String, String> errorMap = Map.of("message", "Erro ao processar resposta da IA: " + e.getMessage());
+                        return Mono.just(new ResponseEntity<>(errorMap, HttpStatus.INTERNAL_SERVER_ERROR));
+                    }
                 })
-                .defaultIfEmpty(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(Map.of("message", "Erro ao gerar o roadmap")));
+                .onErrorResume(e -> {
+                    logger.error("Erro ao gerar roadmap para userID: {}", id, e);
+                    Map<String, String> errorMap = Map.of("message", "Erro ao gerar o roadmap: " + e.getMessage());
+                    return Mono.just(new ResponseEntity<>(errorMap, HttpStatus.INTERNAL_SERVER_ERROR));
+                });
     }
-
-
 }
-
-
-
-
