@@ -26,67 +26,19 @@ import java.util.regex.Pattern;
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("/api/v1/")
-public class roadmapController {
-
+public class TrilhaController {
     private static final Logger logger = LoggerFactory.getLogger(roadmapController.class);
 
-    private final OpenAIService openAIService;
     private final UserService userService;
     private final SelecaoService selecaoService;
+    private final OpenAIService openAIService;
 
-    public roadmapController(OpenAIService openAIService, UserService userService, SelecaoService selecaoService) {
-        this.openAIService = openAIService;
+    public TrilhaController(OpenAIService openAIService, UserService userService, SelecaoService selecaoService) {
         this.userService = userService;
         this.selecaoService = selecaoService;
+        this.openAIService = openAIService;
     }
 
-    @PostMapping("/roadmap")
-    public ResponseEntity<Map<String, Object>> createRoadmap(@Valid @RequestBody SelecaoDTO selecaoDTO) {
-        try {
-            logger.info("Recebida requisição para criar roadmap: {}", selecaoDTO);
-
-            if (selecaoDTO.userID() == null) {
-                logger.warn("userID nulo recebido");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(Map.of("message", "userID é obrigatório"));
-            }
-
-            Optional<Users> optionalUser = Optional.ofNullable(userService.getUserById(selecaoDTO.userID()));
-            if (optionalUser.isEmpty()) {
-                logger.warn("Usuário não encontrado para userID: {}", selecaoDTO.userID());
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("message", "Usuário não encontrado"));
-            }
-            Users user = optionalUser.get();
-
-            if (selecaoDTO.selecoes() == null || selecaoDTO.selecoes().isEmpty()) {
-                logger.warn("Nenhuma seleção fornecida para userID: {}", selecaoDTO.userID());
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(Map.of("message", "Pelo menos uma seleção é obrigatória"));
-            }
-
-            Selecao selecao = selecaoDTO.mapearSelecao(user);
-            selecaoService.saveSelecao(selecao);
-            logger.info("Seleção salva com sucesso para userID: {}", selecaoDTO.userID());
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("status", "success");
-            response.put("message", "Roadmap criado com sucesso");
-            response.put("usuario", selecao.getUsuario());
-            response.put("itens", selecao.getSelecoes());
-
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-
-        } catch (IllegalArgumentException e) {
-            logger.error("Erro de validação ao processar roadmap: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", "Dados inválidos: " + e.getMessage()));
-        } catch (Exception e) {
-            logger.error("Erro interno ao processar roadmap para userID: {}", selecaoDTO.userID(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "Erro interno no servidor: " + e.getMessage()));
-        }
-    }
 
     @GetMapping("/roadmap/{id}")
     @Cacheable(value = "roadmaps", key = "#id")
@@ -354,6 +306,4 @@ public class roadmapController {
                 ]
                 """.formatted(conteudo, startDate, startDate, startDate, startDate.plusDays(7), startDate.plusDays(9), startDate.plusDays(14));
     }
-
-
 }

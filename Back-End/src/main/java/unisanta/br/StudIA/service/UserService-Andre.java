@@ -42,6 +42,7 @@ public class UserService {
 
     @Transactional
     public Users getUserByEmail(String email) {
+//        Hibernate.initialize(userRepository.findByEmail(email));
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuario não encontrado"));
     }

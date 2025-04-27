@@ -44,10 +44,6 @@ public class Users {
     private List<Selecao> selecoes = new ArrayList<>();
 
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    @Column(name = "trilha", nullable = false)
-    private List<Selecao> trilha = new ArrayList<>();
-
 
 
 
@@ -109,13 +105,7 @@ public class Users {
         this.selecoes = selecoes;
     }
 
-    public List<Selecao> getTrilha() {
-        return trilha;
-    }
 
-    public void setTrilha(List<Selecao> trilha) {
-        this.trilha = trilha;
-    }
 
 
 

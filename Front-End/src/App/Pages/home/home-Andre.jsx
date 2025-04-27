@@ -7,10 +7,6 @@ import {
   Snackbar,
   Alert,
   IconButton,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Typography,
 } from "@mui/material";
 import {
   NavigateNext,
@@ -21,9 +17,8 @@ import {
   NotificationsOff,
   Save,
   Refresh,
-  ExpandMore as ExpandMoreIcon,
 } from "@mui/icons-material";
-import axios from "axios";
+import axios from "axios"; // Adicionando axios para melhor gerenciamento de requisições
 
 export const TelaInicial = () => {
   const location = useLocation();
@@ -46,7 +41,6 @@ export const TelaInicial = () => {
   const [notificationMessage, setNotificationMessage] = useState("");
   const [notificationType, setNotificationType] = useState("success");
   const [retryCount, setRetryCount] = useState(0);
-  const [expandedAccordion, setExpandedAccordion] = useState(false); // Estado para controlar o Accordion
 
   const calculateProgress = useMemo(() => {
     if (!roadmap) return 0;
@@ -74,10 +68,6 @@ export const TelaInicial = () => {
       ...prev,
       [sectionId]: !prev[sectionId],
     }));
-  };
-
-  const handleAccordionChange = (panel) => (event, isExpanded) => {
-    setExpandedAccordion(isExpanded ? panel : false);
   };
 
   useEffect(() => {
@@ -138,7 +128,7 @@ export const TelaInicial = () => {
 
     try {
       const userResponse = await axios.get(`http://localhost:8080/api/v1/auth/${parsedUserId}`, {
-        timeout: 10000,
+        timeout: 10000, 
       });
       setUser(userResponse.data.user.username);
     } catch (error) {
@@ -150,10 +140,10 @@ export const TelaInicial = () => {
 
     try {
       const roadmapResponse = await axios.get(`http://localhost:8080/api/v1/roadmap/${parsedUserId}`, {
-        timeout: 50000,
+        timeout: 30000,
       });
-      setRoadmap(roadmapResponse.data);
-      setRetryCount(0);
+      setRoadmap(roadmapResponse.data); 
+      setRetryCount(0); 
     } catch (error) {
       setError(
         `Não foi possível carregar o roadmap: ${error.response?.data?.message || error.message}. Clique em "Tentar Novamente" ou retorne ao login.`
@@ -239,7 +229,7 @@ export const TelaInicial = () => {
   const saveProgress = () => {
     const progress = {};
     roadmap.forEach((item) => {
-      progress[item.ordem] = calculateProgress;
+      progress[item.ordem] = calculateProgress; // Usando ordem como chave
     });
     localStorage.setItem("studyProgress", JSON.stringify(progress));
     showNotificationMessage("Progresso salvo com sucesso!", "success");
@@ -269,7 +259,7 @@ export const TelaInicial = () => {
           <div className="loading-circle" />
           <p>
             Carregando seu guia de aprendizado...
-            <span className="user-name">{user || "Usuário"}</span>...
+            {/* <span className="user-name">{user || "Usuário"}</span>... */}
           </p>
         </div>
       </div>
@@ -404,58 +394,25 @@ export const TelaInicial = () => {
                                   </div>
                                   <span>{Math.round(calculateSectionProgress(currentRoadmapItem))}%</span>
                                 </div>
-                                <div className="submodules-list">
+                                <ul className="submodules-list">
                                   {currentRoadmapItem.submodulos.map((sub, subIndex) => {
                                     const key = `${currentItemIndex}-${subIndex}`;
                                     return (
-                                      <Accordion
-                                        key={subIndex}
-                                        expanded={expandedAccordion === `panel-${subIndex}`}
-                                        onChange={handleAccordionChange(`panel-${subIndex}`)}
-                                      >
-                                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                                          <label style={{ display: "flex", alignItems: "center" }}>
-                                            <input
-                                              type="checkbox"
-                                              checked={!!completedSubmodules[key]}
-                                              onChange={() => handleSubmoduleToggle(currentItemIndex, subIndex)}
-                                              onClick={(e) => e.stopPropagation()} // Evita que o clique no checkbox expanda o accordion
-                                            />
-                                            <Typography
-                                              className={completedSubmodules[key] ? "completed" : ""}
-                                              style={{ marginLeft: "8px" }}
-                                            >
-                                              {sub.nome}
-                                            </Typography>
-                                          </label>
-                                        </AccordionSummary>
-                                        <AccordionDetails>
-                                          {sub.recursos && sub.recursos.length > 0 ? (
-                                            <ul>
-                                              {sub.recursos.map((recurso, idx) => (
-                                                <li key={idx}>
-                                                  {recurso.tipo}: {recurso.nome}{" "}
-                                                  {recurso.link && (
-                                                    <a
-                                                      href={recurso.link}
-                                                      target="_blank"
-                                                      rel="noopener noreferrer"
-                                                      className="material-link"
-                                                    >
-                                                      [Acessar]
-                                                    </a>
-                                                  )}
-                                                </li>
-                                              ))}
-                                            </ul>
-                                          ) : (
-                                            <Typography>Nenhum recurso disponível.</Typography>
-                                          )}
-                                        </AccordionDetails>
-                                      </Accordion>
+                                      <li key={subIndex} className="submodule-item">
+                                        <label>
+                                          <input
+                                            type="checkbox"
+                                            checked={!!completedSubmodules[key]}
+                                            onChange={() => handleSubmoduleToggle(currentItemIndex, subIndex)}
+                                          />
+                                          <span className={completedSubmodules[key] ? "completed" : ""}>
+                                            {sub}
+                                          </span>
+                                        </label>
+                                      </li>
                                     );
                                   })}
-                                </div>
+                                </ul>
                               </div>
                             )}
 

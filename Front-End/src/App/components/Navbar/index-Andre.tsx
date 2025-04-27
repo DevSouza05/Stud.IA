@@ -22,7 +22,6 @@ export function Navbar({ variant }) {
             <>
               <li><Link to="/home" className="navbar-link">Home</Link></li>
               <li><Link to="/Dashboard" className="navbar-link">Progresso</Link></li>
-              <li><Link to="/#" className="navbar-link">Trilha</Link></li>
             </>
           ) : (
             <>
@@ -34,7 +33,7 @@ export function Navbar({ variant }) {
           )}
         </ul>
 
-        
+        {/* O DrawerMenu só aparece quando variant for 'home' */}
         {variant === "home" && <DrawerMenu />}
       </div>
     </nav>
