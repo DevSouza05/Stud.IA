@@ -264,12 +264,13 @@ export const TelaInicial = () => {
   if (loadingUser || loadingRoadmap) {
     return (
       <div className="home-container">
-        <Navbar variant="home" />
+        <Navbar variant="home" userId={userId} />
+
         <div className="loading-container">
           <div className="loading-circle" />
           <p>
             Carregando seu guia de aprendizado...
-            <span className="user-name">{user || "Usuário"}</span>...
+            
           </p>
         </div>
       </div>

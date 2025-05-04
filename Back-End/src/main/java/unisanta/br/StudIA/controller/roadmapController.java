@@ -169,191 +169,96 @@ public class roadmapController {
     private String buildPrompt(String conteudo) {
         LocalDate startDate = LocalDate.now();
         return """
-                Com base nas seleções: %s, crie um roadmap de estudos personalizado em formato JSON puro, sem Markdown, texto adicional ou comentários. Siga as diretrizes:
-                
-                1. **Estrutura do JSON**:
-                   - Retorne um array com **pelo menos 5 módulos** (tópicos), cada um representando um módulo de estudo:
-                     - `titulo`: Nome do módulo (string, ex.: 'Fundamentos de Cybersecurity').
-                     - `ordem`: Sequência ideal (inteiro, 1+).
-                     - `submodulos`: Array de **pelo menos 5 a 8 submódulos por módulo**, cada submódulo sendo um objeto com:
-                       - `nome`: Nome do submódulo (string, ex.: 'Conceitos Básicos de Segurança da Informação').
-                       - `recursos`: Array de 1 a 3 objetos com:
-                         - `tipo`: Tipo do material (ex.: 'vídeo-aula', 'artigo', 'documentação', 'curso online').
-                         - `nome`: Nome do recurso (ex.: 'Introdução à Segurança - YouTube').
-                         - `link`: URL específica (ex.: 'https://youtube.com/watch?v=abc123').
-                     - `cronograma`: Array de objetos com:
-                       - `dia`: Data (YYYY-MM-DD, inicia em %s).
-                       - `horarioInicio`: Início (HH:MM).
-                       - `horarioFim`: Fim (HH:MM).
-                       - `cargaHoraria`: Duração (inteiro, 1-3h).
-                     - `metodosEstudo`: Array de strings (ex.: 'resumos', 'exercícios').
-                     - `locaisEstudo`: Array de strings (ex.: 'casa', 'biblioteca').
-                     - `materiaisApoio`: Array de objetos com:
-                       - `tipo`: Tipo (ex.: 'livro', 'vídeo-aula').
-                       - `nome`: Nome e fonte.
-                       - `link`: URL específica.
-                     - `dificuldades`: Array de objetos com:
-                       - `descricao`: Descrição.
-                       - `estrategia`: Solução.
-                     - `proximosPassos`: Array de strings com próximos estudos.
-                     - `dicasAdicionais`: Array de strings com dicas.
-                     - `nivelDificuldade`: 'iniciante', 'intermediário', 'avançado'.
-                     - `tempoEstimadoTotal`: Horas totais (inteiro).
-                     - `metas`: Array de objetos com:
-                       - `descricao`: Meta (ex.: 'Completar 10 exercícios').
-                       - `recompensa`: Recompensa (ex.: 'Pausa de 15 min').
-                     - `progresso`: Inteiro (0-100, inicial 0).
-                     - `exportavel`: Array de strings (ex.: 'PDF', 'Google Calendar').
-                     - `notificacoes`: Array de strings (ex.: 'Iniciar às 08:50').
-                     - `avaliacao`: Objeto com:
-                       - `dificuldadePercebida`: 'pendente' (atualizável: 'fácil', 'média', 'difícil').
-                       - `notas`: Observações (string, vazia).
-                     - `revisoesPlanejadas`: Array de objetos com:
-                       - `dia`: Data (YYYY-MM-DD).
-                       - `duracao`: Horas (inteiro).
-                     - `pontuacao`: Inteiro (inicial 0, para gamificação).
-                     - `proximaTrilha`: (Apenas no último módulo) Objeto com:
-                       - `titulo`: Nome da trilha (string).
-                       - `descricao`: Descrição (string).
-                       - `topicosSugeridos`: Array de strings com próximos tópicos.
-                       - `recursos`: Array de objetos com `tipo`, `nome`, `link`.
-                
-                2. **Cronograma Inteligente**:
-                   - Máximo 4h consecutivas por módulo, com pausas.
-                   - Módulos complexos pela manhã (08:00-12:00).
-                   - Sequência lógica (ex.: 'Fundamentos' antes de 'Ferramentas').
-                   - Máximo 6h diárias, sessões de 1-3h.
-                
-                3. **Gestão de Datas**:
-                   - Inicie em %s, ajustando para dia útil.
-                   - Evite horários após 22:00 e feriados (ex.: 25/12, 01/01).
-                
-                4. **Técnicas de Aprendizado**:
-                   - Métodos ativos para módulos complexos (ex.: 'projetos').
-                   - Revisões espaçadas para fundamentais (ex.: 'Revisão em 7 dias').
-                
-                5. **Continuidade**:
-                   - No último módulo, inclua `proximaTrilha` com sugestões para continuar o aprendizado.
-                   - Inclua revisões de longo prazo (ex.: 7, 14, 30 dias) em `revisoesPlanejadas`.
-                
-                6. **Gamificação**:
-                   - Metas com recompensas motivacionais.
-                   - `pontuacao` para rastrear pontos por conclusão de metas/submódulos.
-                
-                7. **Saída**:
-                   - JSON puro, válido, sem chaves externas.
-                   - Links reais e confiáveis (ex.: Coursera, YouTube).
-                
-                Exemplo:
-                [
-                  {
-                    "titulo": "Fundamentos de Cybersecurity",
-                    "ordem": 1,
-                    "submodulos": [
-                      {
-                        "nome": "Conceitos Básicos de Segurança da Informação",
-                        "recursos": [
-                          {"tipo": "vídeo-aula", "nome": "Introdução à Segurança - YouTube", "link": "https://youtube.com/watch?v=abc123"},
-                          {"tipo": "artigo", "nome": "O que é Cybersecurity - Kaspersky", "link": "https://kaspersky.com/cybersecurity"}
-                        ]
-                      },
-                      {
-                        "nome": "Tipos de Ameaças e Vulnerabilidades",
-                        "recursos": [
-                          {"tipo": "documentação", "nome": "OWASP Top 10", "link": "https://owasp.org/Top10"}
-                        ]
-                      },
-                      {
-                        "nome": "Princípios de Defesa em Profundidade",
-                        "recursos": [
-                          {"tipo": "vídeo-aula", "nome": "Defesa em Profundidade - Cybrary", "link": "https://cybrary.it/course/defense-in-depth"}
-                        ]
-                      },
-                      {
-                        "nome": "Normas e Regulamentações de Segurança (ISO 27001, NIST)",
-                        "recursos": [
-                          {"tipo": "documentação", "nome": "ISO 27001 Overview", "link": "https://iso.org/iso-27001"}
-                        ]
-                      },
-                      {
-                        "nome": "Introdução à Criptografia",
-                        "recursos": [
-                          {"tipo": "curso online", "nome": "Criptografia Básica - Coursera", "link": "https://coursera.org/learn/crypto"}
-                        ]
-                      }
-                    ],
-                    "cronograma": [{"dia": "%s", "horarioInicio": "09:00", "horarioFim": "11:00", "cargaHoraria": 2}],
-                    "metodosEstudo": ["leitura", "resumos"],
-                    "locaisEstudo": ["casa"],
-                    "materiaisApoio": [{"tipo": "livro", "nome": "Security Engineering - Ross Anderson", "link": "https://example.com"}],
-                    "dificuldades": [{"descricao": "Complexidade", "estrategia": "Prática diária"}],
-                    "proximosPassos": ["Estudar Ferramentas de Segurança"],
-                    "dicasAdicionais": ["Pratique diariamente"],
-                    "nivelDificuldade": "iniciante",
-                    "tempoEstimadoTotal": 60,
-                    "metas": [{"descricao": "Completar 10 exercícios", "recompensa": "Pausa de 15 min"}],
-                    "progresso": 0,
-                    "exportavel": ["PDF"],
-                    "notificacoes": ["Iniciar às 08:50"],
-                    "avaliacao": {"dificuldadePercebida": "pendente", "notas": ""},
-                    "revisoesPlanejadas": [{"dia": "%s", "duracao": 1}],
-                    "pontuacao": 0
-                  },
-                  {
-                    "titulo": "Ferramentas de Cybersecurity",
-                    "ordem": 2,
-                    "submodulos": [
-                      {
-                        "nome": "Uso de Firewalls",
-                        "recursos": [
-                          {"tipo": "vídeo-aula", "nome": "Firewalls 101 - YouTube", "link": "https://youtube.com/watch?v=firewall101"}
-                        ]
-                      },
-                      {
-                        "nome": "Análise com Wireshark",
-                        "recursos": [
-                          {"tipo": "documentação", "nome": "Wireshark Docs", "link": "https://wireshark.org/docs"}
-                        ]
-                      },
-                      {
-                        "nome": "Introdução ao Metasploit",
-                        "recursos": [
-                          {"tipo": "curso online", "nome": "Metasploit Basics - Udemy", "link": "https://udemy.com/course/metasploit-basics"}
-                        ]
-                      },
-                      {
-                        "nome": "Configuração de VPNs",
-                        "recursos": [
-                          {"tipo": "artigo", "nome": "Como Configurar VPN - NordVPN", "link": "https://nordvpn.com/setup"}
-                        ]
-                      },
-                      {
-                        "nome": "Monitoramento com SIEM",
-                        "recursos": [
-                          {"tipo": "vídeo-aula", "nome": "SIEM Explained - Cybrary", "link": "https://cybrary.it/course/siem"}
-                        ]
-                      }
-                    ],
-                    "cronograma": [{"dia": "%s", "horarioInicio": "09:00", "horarioFim": "11:00", "cargaHoraria": 2}],
-                    "metodosEstudo": ["prática", "projetos"],
-                    "locaisEstudo": ["casa"],
-                    "materiaisApoio": [{"tipo": "livro", "nome": "Hacking for Dummies", "link": "https://example.com"}],
-                    "dificuldades": [{"descricao": "Configuração técnica", "estrategia": "Seguir tutoriais práticos"}],
-                    "proximosPassos": ["Aprofundar em Testes de Penetração"],
-                    "dicasAdicionais": ["Pratique em ambientes virtuais"],
-                    "nivelDificuldade": "intermediário",
-                    "tempoEstimadoTotal": 50,
-                    "metas": [{"descricao": "Configurar um firewall", "recompensa": "Pausa de 20 min"}],
-                    "progresso": 0,
-                    "exportavel": ["PDF"],
-                    "notificacoes": ["Iniciar às 08:50"],
-                    "avaliacao": {"dificuldadePercebida": "pendente", "notas": ""},
-                    "revisoesPlanejadas": [{"dia": "%s", "duracao": 1}],
-                    "pontuacao": 0
-                  }
-                ]
-                """.formatted(conteudo, startDate, startDate, startDate, startDate.plusDays(7), startDate.plusDays(9), startDate.plusDays(14));
+            Com base nas seleções: %s, gere um roadmap de estudos personalizado em formato JSON puro. Siga estas diretrizes:
+
+            1. **Saída**:
+               - Retorne SOMENTE um array JSON válido, começando com `[` e terminando com `]`.
+               - NÃO inclua Markdown (ex.: ```json), texto introdutório, explicações, comentários ou qualquer conteúdo fora do JSON.
+               - Garanta que o JSON seja completo, sem truncamento, e passe em validações de sintaxe.
+
+            2. **Estrutura**:
+               - Array com 5 módulos, cada um com:
+                 - `titulo`: Nome do módulo (string).
+                 - `ordem`: Sequência (inteiro, 1+).
+                 - `submodulos`: 5-8 objetos com:
+                   - `nome`: Nome do submódulo (string).
+                   - `recursos`: 2-3 objetos com `tipo` (ex.: 'vídeo-aula', 'artigo'), `nome`, `link` (URL real).
+                 - `cronograma`: Objetos com `dia` (YYYY-MM-DD, a partir de %s, dias úteis), `horarioInicio` (HH:MM), `horarioFim` (HH:MM), `cargaHoraria` (1-3h).
+                 - `metodosEstudo`: Strings (ex.: 'resumos', 'projetos').
+                 - `locaisEstudo`: Strings (ex.: 'casa', 'biblioteca').
+                 - `materiaisApoio`: Objetos com `tipo`, `nome`, `link` (URL real).
+                 - `dificuldades`: Objetos com `descricao`, `estrategia`.
+                 - `proximosPassos`: Strings com próximos estudos.
+                 - `dicasAdicionais`: Strings com dicas.
+                 - `nivelDificuldade`: 'iniciante', 'intermediário' ou 'avançado'.
+                 - `tempoEstimadoTotal`: Horas (inteiro).
+                 - `metas`: Objetos com `descricao`, `recompensa`.
+                 - `progresso`: 0.
+                 - `exportavel`: Strings (ex.: 'PDF', 'Google Calendar').
+                 - `notificacoes`: Strings (ex.: 'Iniciar às 08:50').
+                 - `avaliacao`: Objeto com `dificuldadePercebida` ('pendente'), `notas` (vazio).
+                 - `revisoesPlanejadas`: Objetos com `dia` (YYYY-MM-DD), `duracao` (horas).
+                 - `pontuacao`: 0.
+                 - `proximaTrilha` (apenas no último módulo): Objeto com `titulo`, `descricao` (completa), `topicosSugeridos`, `recursos` (objetos com `tipo`, `nome`, `link`).
+
+            3. **Cronograma**:
+               - Máximo 6h/dia, sessões de 1-3h, até 4h consecutivas.
+               - Módulos complexos pela manhã (08:00-12:00).
+               - Evite horários após 22:00 e feriados (ex.: 25/12, 01/01).
+
+            4. **Aprendizado**:
+               - Métodos ativos (ex.: 'projetos') para módulos complexos.
+               - Revisões espaçadas (7, 14, 30 dias) em `revisoesPlanejadas`.
+
+            5. **Gamificação**:
+               - Metas com recompensas motivacionais.
+               - `pontuacao` para rastrear progresso.
+
+            6. **Exemplo**:
+               [
+                 {
+                   "titulo": "Fundamentos de Programação",
+                   "ordem": 1,
+                   "submodulos": [
+                     {
+                       "nome": "Variáveis",
+                       "recursos": [
+                         {"tipo": "vídeo-aula", "nome": "Intro to Variables - freeCodeCamp", "link": "https://www.youtube.com/watch?v=8wW5s9fV_0s"}
+                       ]
+                     }
+                   ],
+                   "cronograma": [
+                     {"dia": "%s", "horarioInicio": "09:00", "horarioFim": "11:00", "cargaHoraria": 2}
+                   ],
+                   "metodosEstudo": ["leitura", "exercícios"],
+                   "locaisEstudo": ["casa"],
+                   "materiaisApoio": [
+                     {"tipo": "livro", "nome": "Eloquent JavaScript", "link": "https://eloquentjavascript.net/"}
+                   ],
+                   "dificuldades": [
+                     {"descricao": "Sintaxe", "estrategia": "Prática diária"}
+                   ],
+                   "proximosPassos": ["Estudar funções"],
+                   "dicasAdicionais": ["Pratique com exercícios"],
+                   "nivelDificuldade": "iniciante",
+                   "tempoEstimadoTotal": 20,
+                   "metas": [
+                     {"descricao": "Completar 5 exercícios", "recompensa": "Pausa de 15 min"}
+                   ],
+                   "progresso": 0,
+                   "exportavel": ["PDF"],
+                   "notificacoes": ["Iniciar às 08:50"],
+                   "avaliacao": {"dificuldadePercebida": "pendente", "notas": ""},
+                   "revisoesPlanejadas": [
+                     {"dia": "%s", "duracao": 1}
+                   ],
+                   "pontuacao": 0
+                 }
+               ]
+
+            **IMPORTANTE**: Retorne SOMENTE o JSON puro, sem qualquer outro conteúdo. Garanta que todos os campos sejam preenchidos corretamente e que o JSON seja válido.
+            """.formatted(conteudo, startDate, startDate, startDate.plusDays(7));
+        }
     }
 
 
-}

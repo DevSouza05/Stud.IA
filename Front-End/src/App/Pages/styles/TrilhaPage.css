@@ -1,0 +1,97 @@
+/* Import global styles */
+/* @import url("../styles/global.css"); */
+
+/* Additional styles for TrilhaPage */
+.home-container {
+  padding-top: 80px;
+}
+
+.card.roadmap-section {
+  overflow: visible;
+}
+
+.tree-container {
+  margin-top: 20px;
+}
+
+.tree-node {
+  position: relative;
+  margin-left: 20px;
+  padding-left: 20px;
+  border-left: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.tree-node::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 20px;
+  width: 20px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.tree-node.level-0 {
+  margin-left: 0;
+  padding-left: 0;
+  border-left: none;
+}
+
+.tree-node.level-0::before {
+  display: none;
+}
+
+.node-content {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.node-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.node-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px; /* Reduzido de um tamanho presumido (ex.: 16px) para 14px */
+}
+
+.toggle-button {
+  min-width: 0 !important;
+  padding: 0 !important;
+  color: #4facfe !important;
+}
+
+.node-details {
+  margin-top: 10px;
+  padding-left: 28px;
+  font-size: 13px; /* Reduzido para 13px para detalhes */
+}
+
+.node-details ul {
+  padding-left: 20px;
+  margin: 10px 0;
+}
+
+.node-details li {
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 8px;
+  font-size: 13px; /* Reduzido para 13px para itens da lista */
+}
+
+.subnodes {
+  margin-top: 10px;
+}
+
+.completed {
+  color: #4facfe;
+  text-decoration: line-through;
+  font-size: 14px; /* Reduzido para 14px para texto completado */
+}

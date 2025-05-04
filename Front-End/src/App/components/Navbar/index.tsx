@@ -1,10 +1,22 @@
+// src/components/Navbar/index.tsx
 import { Link } from "react-router-dom";
 import "../../Pages/styles/Navbar.css";
-import React, { useState } from "react";
-import DrawerMenu from "../Drawer/drawer"
+import React, { useState, useEffect } from "react";
+import DrawerMenu from "../Drawer/drawer";
 
-export function Navbar({ variant }) {
+interface NavbarProps {
+  variant?: string;
+}
+
+export function Navbar({ variant }: NavbarProps) {
   const [isMenuActive, setIsMenuActive] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  // Obter userId do localStorage ao carregar o componente
+  useEffect(() => {
+    const storedUserId = localStorage.getItem("userId");
+    setUserId(storedUserId);
+  }, []);
 
   const toggleMenu = () => {
     setIsMenuActive(!isMenuActive);
@@ -14,27 +26,57 @@ export function Navbar({ variant }) {
     <nav className={`navbar ${variant === "home" ? "home" : ""}`}>
       <div className="navbar-container">
         <Link to="/" className="navbar-logo">
-          <img src="./iconLogoStudia.png" alt="Stud.Ia Logo" />
+          <img src="/iconLogoStudia.png" alt="Stud.Ia Logo" />
         </Link>
 
         <ul className={`navbar-menu ${isMenuActive ? "active" : ""}`}>
           {variant === "home" ? (
             <>
-              <li><Link to="/home" className="navbar-link">Home</Link></li>
-              <li><Link to="/Dashboard" className="navbar-link">Progresso</Link></li>
-              <li><Link to="/#" className="navbar-link">Trilha</Link></li>
+              <li>
+                <Link to="/home" className="navbar-link">
+                  Home
+                </Link>
+              </li>
+              <li>
+                <Link to="/dashboard" className="navbar-link">
+                  Progresso
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to={userId ? `/trilha/${userId}` : "/login"}
+                  className="navbar-link"
+                >
+                  Trilha
+                </Link>
+              </li>
             </>
           ) : (
             <>
-              <li><Link to="/" className="navbar-link">Home</Link></li>
-              <li><Link to="/sobre" className="navbar-link">Sobre</Link></li>
-              <li><Link to="/login" className="navbar-button">Entrar</Link></li>
-              <li><Link to="/cadastro" className="navbar-signup">Criar conta</Link></li>
+              <li>
+                <Link to="/" className="navbar-link">
+                  Home
+                </Link>
+              </li>
+              <li>
+                <Link to="/sobre" className="navbar-link">
+                  Sobre
+                </Link>
+              </li>
+              <li>
+                <Link to="/login" className="navbar-button">
+                  Entrar
+                </Link>
+              </li>
+              <li>
+                <Link to="/cadastro" className="navbar-signup">
+                  Criar conta
+                </Link>
+              </li>
             </>
           )}
         </ul>
 
-        
         {variant === "home" && <DrawerMenu />}
       </div>
     </nav>

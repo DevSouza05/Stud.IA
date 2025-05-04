@@ -31,7 +31,6 @@ import { saveAs } from 'file-saver';
 import PropTypes from 'prop-types';
 import { templates } from './templates';
 
-// Definindo interfaces para os tipos
 interface FormData {
   [key: string]: any;
   name: string;
@@ -72,7 +71,6 @@ interface ErrorState {
   [key: string]: string;
 }
 
-// Componente de barra de progresso estilizado
 const StyledProgressBar = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'center',
@@ -254,19 +252,16 @@ const DrawerMenu = () => {
       const doc = new jsPDF();
       let y = 20;
 
-      // Nome
       doc.setFontSize(24);
       doc.setTextColor(33, 33, 33);
       doc.text(formData.name, 20, y);
       y += 10;
 
-      // Informações de contato
       doc.setFontSize(12);
       doc.setTextColor(117, 117, 117);
       doc.text(`${formData.email} | ${formData.phone} | ${formData.location}`, 20, y);
       y += 15;
 
-      // Objetivo Profissional
       doc.setFontSize(16);
       doc.setTextColor(33, 33, 33);
       doc.text('Objetivo Profissional', 20, y);
@@ -276,7 +271,6 @@ const DrawerMenu = () => {
       doc.text(formData.professionalObjective, 20, y);
       y += 15;
 
-      // Experiência
       doc.setFontSize(16);
       doc.setTextColor(33, 33, 33);
       doc.text('Experiência Profissional', 20, y);
@@ -296,7 +290,6 @@ const DrawerMenu = () => {
         y += 15;
       });
 
-      // Educação
       if (formData.education.length > 0) {
         doc.setFontSize(16);
         doc.setTextColor(33, 33, 33);
