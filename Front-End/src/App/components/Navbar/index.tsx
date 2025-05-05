@@ -12,7 +12,6 @@ export function Navbar({ variant }: NavbarProps) {
   const [isMenuActive, setIsMenuActive] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
 
-  // Obter userId do localStorage ao carregar o componente
   useEffect(() => {
     const storedUserId = localStorage.getItem("userId");
     setUserId(storedUserId);

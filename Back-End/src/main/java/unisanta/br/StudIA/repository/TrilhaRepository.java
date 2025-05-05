@@ -8,5 +8,4 @@ import java.util.Optional;
 public interface TrilhaRepository extends JpaRepository<Trilha, Long> {
 
     Optional<Trilha> findByUser_UserId(Long userId);
-
 }

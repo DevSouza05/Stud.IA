@@ -12,8 +12,8 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import "../styles/TrilhaPage.css";
+import { Navbar } from "../../components/Navbar/index.tsx";
 
-// Configuração do axios com URL base do ambiente
 axios.defaults.baseURL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 const TreeNode = ({ node, progress, handleCheckboxChange, level = 0 }) => {
@@ -175,7 +175,6 @@ const TrilhaPage = () => {
       }
       try {
         const response = await axios.get(`/api/v1/trilha/${id}`);
-        // Verificar se a resposta contém a chave 'trilha'
         const data = response.data.trilha || response.data;
         if (!data.nos || !Array.isArray(data.nos)) {
           throw new Error("Estrutura de dados inválida: 'nos' não encontrado ou não é um array");
@@ -219,6 +218,8 @@ const TrilhaPage = () => {
   if (error) {
     return (
       <div className="home-container">
+        <Navbar variant="home" />
+
         <div className="main-content">
           <Typography color="error" role="alert">
             {error}
@@ -231,6 +232,8 @@ const TrilhaPage = () => {
   if (!trilha || !trilha.titulo) {
     return (
       <div className="home-container">
+        <Navbar variant="home" />
+
         <div className="main-content">
           <Typography>Nenhuma trilha encontrada.</Typography>
         </div>
@@ -240,6 +243,8 @@ const TrilhaPage = () => {
 
   return (
     <div className="home-container">
+      <Navbar variant="home" />
+
       <div className="main-content">
         <Typography variant="h1">{trilha.titulo}</Typography>
         <Typography variant="h2">

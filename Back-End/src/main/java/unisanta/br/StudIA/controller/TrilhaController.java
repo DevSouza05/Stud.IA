@@ -56,6 +56,18 @@ public class TrilhaController {
             return Mono.just(new ResponseEntity<>(Map.of("message", "Seleção não encontrada para o usuário"), HttpStatus.NOT_FOUND));
         }
 
+        String trilhaSalva = trilhaService.getTrilhaByUserId(id);
+        if (trilhaSalva != null) {
+            logger.info("Trilha existente retornada para userID: {}", id);
+            try {
+                Object parsedResponse = JSON.parseObject(trilhaSalva);
+                return Mono.just(ResponseEntity.ok(parsedResponse));
+            } catch (Exception e) {
+                logger.error("Erro ao parsear trilha salva para userID: {}", id, e);
+                return Mono.just(new ResponseEntity<>(Map.of("message", "Erro ao processar trilha salva: " + e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR));
+            }
+        }
+
         String conteudo = String.join(", ", selecao.getSelecoes());
         String prompt = buildPrompt(conteudo);
 
