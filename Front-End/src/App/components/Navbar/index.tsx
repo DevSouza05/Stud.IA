@@ -2,13 +2,17 @@
 import { Link } from "react-router-dom";
 import "../../Pages/styles/Navbar.css";
 import React, { useState, useEffect } from "react";
-import DrawerMenu from "../Drawer/drawer";
+import MenuIcon from '@mui/icons-material/Menu';
+import IconButton from '@mui/material/IconButton';
+import { useTranslation } from 'react-i18next';
 
 interface NavbarProps {
   variant?: string;
+  onMenuClick?: () => void;
 }
 
-export function Navbar({ variant }: NavbarProps) {
+export function Navbar({ variant, onMenuClick }: NavbarProps) {
+  const { t } = useTranslation();
   const [isMenuActive, setIsMenuActive] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
 
@@ -28,18 +32,17 @@ export function Navbar({ variant }: NavbarProps) {
         <Link to="/" className="navbar-logo">
           <img src="/iconLogoStudia.png" alt="Stud.Ia Logo" />
         </Link>
-
         <ul className={`navbar-menu ${isMenuActive ? "active" : ""}`}>
           {variant === "home" ? (
             <>
               <li>
                 <Link to="/home" className="navbar-link">
-                  Home
+                  {t('Home')}
                 </Link>
               </li>
               <li>
                 <Link to="/dashboard" className="navbar-link">
-                  Progresso
+                  {t('Progresso')}
                 </Link>
               </li>
               <li>
@@ -47,7 +50,7 @@ export function Navbar({ variant }: NavbarProps) {
                   to={userId ? `/trilha/${userId}` : "/login"}
                   className="navbar-link"
                 >
-                  Trilha
+                  {t('Trilha')}
                 </Link>
               </li>
             </>
@@ -55,29 +58,38 @@ export function Navbar({ variant }: NavbarProps) {
             <>
               <li>
                 <Link to="/" className="navbar-link">
-                  Home
+                  {t('Home')}
                 </Link>
               </li>
               <li>
                 <Link to="/sobre" className="navbar-link">
-                  Sobre
+                  {t('Sobre')}
                 </Link>
               </li>
               <li>
                 <Link to="/login" className="navbar-button">
-                  Entrar
+                  {t('Entrar')}
                 </Link>
               </li>
               <li>
                 <Link to="/cadastro" className="navbar-signup">
-                  Criar conta
+                  {t('Criar conta')}
                 </Link>
               </li>
             </>
           )}
         </ul>
-
-        {variant === "home" && <DrawerMenu />}
+        {variant === "home" && (
+          <IconButton
+            edge="end"
+            color="inherit"
+            aria-label="menu"
+            onClick={onMenuClick}
+            sx={{ ml: 2 }}
+          >
+            <MenuIcon />
+          </IconButton>
+        )}
       </div>
     </nav>
   );

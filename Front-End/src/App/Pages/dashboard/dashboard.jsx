@@ -14,8 +14,10 @@ import {
 } from "recharts";
 import "../styles/dashboard.css";
 import { Navbar } from "../../components/Navbar/index.tsx";
+import { useTranslation } from 'react-i18next';
 
 const Dashboard = ({ etapas = [] }) => {
+  const { t } = useTranslation();
   const numeroDeDiasNoMes = 31;
   const [concluidos, setConcluidos] = useState(() => {
     const saved = localStorage.getItem("completedSubmodules");
@@ -143,19 +145,19 @@ const Dashboard = ({ etapas = [] }) => {
     <>
       <Navbar variant="home" />
       <div className="progresso-container">
-        <h2>Meu Progresso</h2>
+        <h2>{t('dashboard.meuProgresso')}</h2>
 
         <div className="stats-grid">
           <div className="stat-card">
-            <h4>Dias Estudados</h4>
+            <h4>{t('dashboard.diasEstudados')}</h4>
             <p>{diasEstudadosInteiros}</p>
           </div>
           <div className="stat-card">
-            <h4>Sequência Atual</h4>
+            <h4>{t('dashboard.sequenciaAtual')}</h4>
             <p>{sequenciaAtual} dias</p>
           </div>
           <div className="stat-card">
-            <h4>Maior Sequência</h4>
+            <h4>{t('dashboard.maiorSequencia')}</h4>
             <p>{maiorSequencia} dias</p>
           </div>
         </div>
@@ -197,7 +199,7 @@ const Dashboard = ({ etapas = [] }) => {
         </div>
 
         <div className="chart-container">
-          <h3>Evolução do Progresso</h3>
+          <h3>{t('dashboard.evolucaoProgresso')}</h3>
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={dadosGrafico}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
@@ -232,7 +234,7 @@ const Dashboard = ({ etapas = [] }) => {
           </ResponsiveContainer>
         </div>
 
-        <h3>Calendário de Estudos</h3>
+        <h3>{t('dashboard.calendarioEstudos')}</h3>
         <div className="calendario">
           {diasEstudo.map((dia, index) => (
             <div
@@ -247,10 +249,10 @@ const Dashboard = ({ etapas = [] }) => {
 
         <div className="info-container">
           <div className="info-card">
-            <p>Dias Restantes: {numeroDeDiasNoMes - diasEstudadosInteiros}</p>
+            <p>{t('dashboard.diasRestantes')}: {numeroDeDiasNoMes - diasEstudadosInteiros}</p>
           </div>
           <div className="info-card">
-            <p>Meta Mensal: {numeroDeDiasNoMes} dias</p>
+            <p>{t('dashboard.metaMensal')}: {numeroDeDiasNoMes} dias</p>
           </div>
         </div>
       </div>
