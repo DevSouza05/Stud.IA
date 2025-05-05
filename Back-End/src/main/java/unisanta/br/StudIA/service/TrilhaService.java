@@ -18,6 +18,12 @@ public class TrilhaService {
         this.userRepository = userRepository;
     }
 
+    public String getTrilhaByUserId(Long userId) {
+        return trilhaRepository.findByUser_UserId(userId)
+                .map(Trilha::getTrilhaJson)
+                .orElse(null);
+    }
+
     public void saveTrilha(Long userId, String trilhaJson) {
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado para userID: " + userId));

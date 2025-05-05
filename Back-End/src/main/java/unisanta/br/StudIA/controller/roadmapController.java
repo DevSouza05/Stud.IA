@@ -9,15 +9,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+import unisanta.br.StudIA.Model.Modulos;
 import unisanta.br.StudIA.Model.Selecao;
 import unisanta.br.StudIA.Model.Users;
+import unisanta.br.StudIA.dto.ModulosDTO;
 import unisanta.br.StudIA.dto.SelecaoDTO;
+import unisanta.br.StudIA.service.ModulosService;
 import unisanta.br.StudIA.service.OpenAIService;
 import unisanta.br.StudIA.service.SelecaoService;
 import unisanta.br.StudIA.service.UserService;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -33,11 +37,18 @@ public class roadmapController {
     private final OpenAIService openAIService;
     private final UserService userService;
     private final SelecaoService selecaoService;
+    private final ModulosService moduleCompletionService;
 
-    public roadmapController(OpenAIService openAIService, UserService userService, SelecaoService selecaoService) {
+    public roadmapController(
+            OpenAIService openAIService,
+            UserService userService,
+            SelecaoService selecaoService,
+            ModulosService moduleCompletionService
+    ) {
         this.openAIService = openAIService;
         this.userService = userService;
         this.selecaoService = selecaoService;
+        this.moduleCompletionService = moduleCompletionService;
     }
 
     @PostMapping("/roadmap")
@@ -106,7 +117,7 @@ public class roadmapController {
         }
 
         String roadmapSalvo = selecao.getRoadmap();
-        if (roadmapSalvo != null) {
+        if (roadmapSalvo != null && !roadmapSalvo.isEmpty()) {
             logger.info("Roadmap existente retornado para userID: {}", id);
             try {
                 Object parsedResponse = JSON.parseArray(roadmapSalvo);
@@ -129,22 +140,7 @@ public class roadmapController {
                             throw new IllegalStateException("API retornou um erro: " + response);
                         }
 
-                        Pattern jsonPattern = Pattern.compile("(?s)```json\\n(.*?)\\n```");
-                        Matcher matcher = jsonPattern.matcher(response);
-                        String jsonString;
-
-                        if (matcher.find()) {
-                            jsonString = matcher.group(1);
-                            logger.debug("JSON extraído de bloco Markdown para userID {}: {}", id, jsonString);
-                        } else {
-                            jsonString = response.trim();
-                            logger.debug("Nenhum bloco Markdown encontrado, usando resposta direta para userID {}: {}", id, jsonString);
-                        }
-
-                        if (!jsonString.startsWith("[") || !jsonString.endsWith("]")) {
-                            throw new IllegalStateException("Resposta não é um array JSON válido: " + jsonString);
-                        }
-
+                        String jsonString = extractJson(response);
                         Object parsedResponse = JSON.parseArray(jsonString);
                         if (parsedResponse == null) {
                             throw new IllegalStateException("JSON parseado resultou em null: " + jsonString);
@@ -155,15 +151,86 @@ public class roadmapController {
                         return Mono.just(ResponseEntity.ok(parsedResponse));
                     } catch (Exception e) {
                         logger.error("Erro ao processar resposta da IA para userID: {}", id, e);
-                        Map<String, String> errorMap = Map.of("message", "Erro ao processar resposta da IA: " + e.getMessage());
-                        return Mono.just(new ResponseEntity<>(errorMap, HttpStatus.INTERNAL_SERVER_ERROR));
+                        return Mono.just(new ResponseEntity<>(Map.of("message", "Erro ao processar resposta da IA: " + e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR));
                     }
                 })
                 .onErrorResume(e -> {
                     logger.error("Erro ao gerar roadmap para userID: {}", id, e);
-                    Map<String, String> errorMap = Map.of("message", "Erro ao gerar o roadmap: " + e.getMessage());
-                    return Mono.just(new ResponseEntity<>(errorMap, HttpStatus.INTERNAL_SERVER_ERROR));
+                    return Mono.just(new ResponseEntity<>(Map.of("message", "Erro ao gerar o roadmap: " + e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR));
                 });
+    }
+
+    @PostMapping("/roadmap/complete/{userId}")
+    public ResponseEntity<Map<String, Object>> completeModule(
+            @PathVariable Long userId,
+            @Valid @RequestBody ModulosDTO completionDTO
+    ) {
+        try {
+            logger.info("Recebida requisição para marcar módulo como concluído para userID: {}, moduleId: {}", userId, completionDTO.moduleId());
+
+            Optional<Users> optionalUser = Optional.ofNullable(userService.getUserById(userId));
+            if (optionalUser.isEmpty()) {
+                logger.warn("Usuário não encontrado para userID: {}", userId);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("message", "Usuário não encontrado"));
+            }
+
+            Modulos completion = new Modulos(
+                    userId,
+                    completionDTO.moduleId(),
+                    completionDTO.title(),
+                    completionDTO.completionDate(),
+                    completionDTO.score()
+            );
+            moduleCompletionService.saveModulos(completion);
+            logger.info("Conclusão de módulo salva para userID: {}, moduleId: {}", userId, completionDTO.moduleId());
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(Map.of(
+                            "status", "success",
+                            "message", "Módulo marcado como concluído com sucesso"
+                    ));
+
+        } catch (Exception e) {
+            logger.error("Erro ao marcar módulo como concluído para userID: {}", userId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Erro ao marcar módulo como concluído: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/roadmap/history/{userId}")
+    public ResponseEntity<?> getCompletionHistory(@PathVariable Long userId) {
+        try {
+            logger.info("Recebida requisição para obter histórico de conclusões para userID: {}", userId);
+
+            Optional<Users> optionalUser = Optional.ofNullable(userService.getUserById(userId));
+            if (optionalUser.isEmpty()) {
+                logger.warn("Usuário não encontrado para userID: {}", userId);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("message", "Usuário não encontrado"));
+            }
+
+            List<Modulos> completions = moduleCompletionService.getModulosCompletosByUserID(userId);
+            logger.info("Histórico de conclusões retornado para userID: {}, total: {}", userId, completions.size());
+
+            return ResponseEntity.ok(completions);
+
+        } catch (Exception e) {
+            logger.error("Erro ao obter histórico de conclusões para userID: {}", userId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Erro ao obter histórico: " + e.getMessage()));
+        }
+    }
+
+    private String extractJson(String response) {
+        Pattern jsonPattern = Pattern.compile("(?s)```json\\n(.*?)\\n```");
+        Matcher matcher = jsonPattern.matcher(response);
+        if (matcher.find()) {
+            logger.debug("JSON extraído de bloco Markdown: {}", matcher.group(1));
+            return matcher.group(1);
+        }
+        logger.debug("Nenhum bloco Markdown encontrado, usando resposta direta: {}", response);
+        return response.trim();
     }
 
     private String buildPrompt(String conteudo) {
@@ -258,7 +325,5 @@ public class roadmapController {
 
             **IMPORTANTE**: Retorne SOMENTE o JSON puro, sem qualquer outro conteúdo. Garanta que todos os campos sejam preenchidos corretamente e que o JSON seja válido.
             """.formatted(conteudo, startDate, startDate, startDate.plusDays(7));
-        }
     }
-
-
+}
