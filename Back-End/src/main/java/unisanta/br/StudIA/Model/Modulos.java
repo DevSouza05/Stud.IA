@@ -1,7 +1,7 @@
 package unisanta.br.StudIA.Model;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "modulos")
@@ -21,7 +21,7 @@ public class Modulos {
     private String title;
 
     @Column(name = "completion_date", nullable = false)
-    private LocalDateTime completionDate;
+    private LocalDate completionDate;
 
     @Column(name = "score", nullable = false)
     private Integer score;
@@ -29,7 +29,7 @@ public class Modulos {
     // Construtores
     public Modulos() {}
 
-    public Modulos(Long userId, Integer moduleId, String title, LocalDateTime completionDate, Integer score) {
+    public Modulos(Long userId, Integer moduleId, String title, LocalDate completionDate, Integer score) {
         this.userId = userId;
         this.moduleId = moduleId;
         this.title = title;
@@ -50,8 +50,8 @@ public class Modulos {
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
 
-    public LocalDateTime getCompletionDate() { return completionDate; }
-    public void setCompletionDate(LocalDateTime completionDate) { this.completionDate = completionDate; }
+    public LocalDate getCompletionDate() { return completionDate; }
+    public void setCompletionDate(LocalDate completionDate) { this.completionDate = completionDate; }
 
     public Integer getScore() { return score; }
     public void setScore(Integer score) { this.score = score; }

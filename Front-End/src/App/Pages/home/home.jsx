@@ -78,11 +78,11 @@ export const TelaInicial = () => {
   const areAllSubmodulesCompletedForModule = (moduleIndex) => {
     if (!roadmap || !Array.isArray(roadmap) || !roadmap[moduleIndex]) return false;
     const module = roadmap[moduleIndex];
-    if (!module.submodulos || module.submodulos.length === 0) return true; // Módulo sem submódulos é considerado concluído
+    if (!module.submodulos || module.submodulos.length === 0) return true;
     return module.submodulos.every((_, subIndex) => completedSubmodules[`${moduleIndex}-${subIndex}`]);
   };
 
-  // Função para verificar se todos os submódulos de todos os módulos estão concluídos (para o botão "Concluir Curso")
+  // Função para verificar se todos os submódulos de todos os módulos estão concluídos
   const areAllPreviousSubmodulesCompleted = () => {
     if (!roadmap || !Array.isArray(roadmap)) return false;
     return roadmap.every((_, index) => areAllSubmodulesCompletedForModule(index));
@@ -201,7 +201,7 @@ export const TelaInicial = () => {
     }
   };
 
-  // Inicializa a busca de dados
+  // Inicializa a busca de dados e histórico
   useEffect(() => {
     if (!userId) {
       setError("ID do usuário não encontrado. Redirecionando para o login...");
@@ -211,6 +211,7 @@ export const TelaInicial = () => {
       return;
     }
     fetchData();
+    fetchHistory(); // Carrega o histórico ao iniciar
   }, [userId, navigate]);
 
   // Função para marcar/desmarcar um submódulo como concluído
@@ -224,74 +225,110 @@ export const TelaInicial = () => {
 
   // Função para marcar um módulo como concluído e salvar no backend e no localStorage
   const handleModuleComplete = async (itemIndex) => {
-    if (!roadmap || !roadmap[itemIndex]) return;
+    if (!roadmap || !roadmap[itemIndex]) {
+      showNotificationMessage("Módulo inválido ou não encontrado.", "error");
+      return;
+    }
     const module = roadmap[itemIndex];
     const moduleId = module.ordem;
-
+  
     try {
-      // Salva no backend
+      const requestBody = {
+        moduleId: Number(moduleId), // Garante que seja um número inteiro
+        title: module.titulo || "Módulo sem título",
+        completionDate: new Date().toISOString().split('T')[0], // Formato YYYY-MM-DD
+        score: Number(module.pontuacao) || 0, // Garante que seja um número inteiro
+      };
+  
+      console.log("Enviando requisição para completar módulo:", requestBody);
+  
       const response = await axios.post(
         `http://localhost:8080/api/v1/roadmap/complete/${userId}`,
-        {
-          moduleId: moduleId,
-          title: module.titulo,
-          completionDate: new Date().toISOString(),
-          score: module.pontuacao || 0,
-        },
+        requestBody,
         { timeout: 10000 }
       );
-
-      // Atualiza o estado local de módulos concluídos
+  
       setCompletedModules((prev) => {
         const newCompletedModules = {
           ...prev,
           [moduleId]: {
             completed: true,
-            completionDate: new Date().toISOString(),
+            completionDate: new Date().toISOString().split('T')[0],
             title: module.titulo,
-            score: module.pontuacao || 0,
+            score: Number(module.pontuacao) || 0,
           },
         };
         return newCompletedModules;
       });
-
+  
       showNotificationMessage(`Módulo "${module.titulo}" concluído com sucesso!`, "success");
-
+  
       // Atualiza o histórico
-      fetchHistory();
+      await fetchHistory();
     } catch (error) {
-      showNotificationMessage(`Erro ao marcar módulo como concluído: ${error.message}`, "error");
+      const errorMessage = error.response?.data?.message || error.message;
+      const errorDetails = error.response?.data?.errors || {};
+      console.error("Erro ao marcar módulo como concluído:", { errorMessage, errorDetails });
+      showNotificationMessage(`Erro ao marcar módulo como concluído: ${errorMessage}`, "error");
     }
   };
 
   // Função para marcar todos os módulos como concluídos (ao clicar em "Concluir Curso")
   const handleCompleteCourse = async () => {
-    if (!roadmap || !Array.isArray(roadmap)) return;
-
+    if (!roadmap || !Array.isArray(roadmap)) {
+      showNotificationMessage("Roadmap inválido ou não carregado.", "error");
+      return;
+    }
+  
+    // Verificar se o curso já foi concluído
+    const courseCompleted = history.some((item) => item.moduleId === 9999);
+    if (courseCompleted) {
+      showNotificationMessage("O curso já foi concluído anteriormente.", "info");
+      return;
+    }
+  
     try {
-      // Marca todos os módulos como concluídos no backend
+      // Marca todos os módulos como concluídos no backend, se ainda não estiverem
       const completionPromises = roadmap.map(async (module, index) => {
         if (!completedModules[module.ordem]?.completed) {
           await handleModuleComplete(index);
         }
       });
-
+  
       await Promise.all(completionPromises);
-
-      showNotificationMessage("Curso concluído com sucesso! Todos os módulos foram salvos.", "success");
-
-      // Limpa os estados locais, se necessário
-      setCompletedSubmodules({});
-      setCompletedModules({});
-      localStorage.removeItem(`completedSubmodules_${userId}`);
-      localStorage.removeItem(`completedModules_${userId}`);
-      localStorage.removeItem(`lastViewedTopicIndex_${userId}`);
-      setCurrentItemIndex(0);
-
-      // Atualiza o histórico
-      fetchHistory();
+  
+      // Calcular a pontuação total, garantindo que seja um número inteiro
+      const totalScore = roadmap.reduce((acc, module) => {
+        const score = Number(module.pontuacao) || 0;
+        return acc + score;
+      }, 0);
+  
+      // Corpo da requisição para marcar o curso como concluído
+      const requestBody = {
+        moduleId: 9999,
+        title: "Curso Completo",
+        completionDate: new Date().toISOString().split('T')[0], // Formato YYYY-MM-DD
+        score: Math.round(totalScore), // Garante que seja um inteiro
+      };
+  
+      console.log("Enviando requisição para completar curso:", requestBody);
+  
+      // Enviar requisição para o backend
+      const response = await axios.post(
+        `http://localhost:8080/api/v1/roadmap/complete/${userId}`,
+        requestBody,
+        { timeout: 10000 }
+      );
+  
+      // Atualiza o histórico imediatamente
+      await fetchHistory();
+  
+      showNotificationMessage("Curso concluído com sucesso! Registrado no histórico.", "success");
     } catch (error) {
-      showNotificationMessage(`Erro ao concluir o curso: ${error.message}`, "error");
+      const errorMessage = error.response?.data?.message || error.message;
+      const errorDetails = error.response?.data?.errors || {};
+      console.error("Erro ao concluir o curso:", { errorMessage, errorDetails });
+      showNotificationMessage(`Erro ao concluir o curso: ${errorMessage}`, "error");
     }
   };
 
@@ -654,11 +691,16 @@ export const TelaInicial = () => {
                                       variant="contained"
                                       startIcon={<CheckCircle />}
                                       onClick={handleCompleteCourse}
-                                      disabled={!areAllPreviousSubmodulesCompleted()}
+                                      disabled={
+                                        !areAllPreviousSubmodulesCompleted() ||
+                                        history.some((item) => item.moduleId === 9999)
+                                      }
                                       className="complete-module-button"
                                       aria-label="Concluir Curso"
                                     >
-                                      Concluir Curso
+                                      {history.some((item) => item.moduleId === 9999)
+                                        ? "Curso Concluído"
+                                        : "Concluir Curso"}
                                     </Button>
                                   </div>
                                 )}
