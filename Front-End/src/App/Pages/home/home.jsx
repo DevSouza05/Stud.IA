@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useTranslation } from 'react-i18next';
+import { Navbar } from "../../components/Navbar/index.tsx";
 import "../styles/home.css";
 import {
   Button,
@@ -29,7 +29,6 @@ import {
 import axios from "axios";
 
 export const TelaInicial = () => {
-  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const [userId, setUserId] = useState(location.state?.userId || localStorage.getItem("userId") || "");
@@ -414,18 +413,10 @@ export const TelaInicial = () => {
   if (loadingUser || loadingRoadmap) {
     return (
       <div className="home-container">
-<<<<<<< HEAD
-        <div className="loading-container">
-          <div className="loading-circle" />
-          <p>
-            {t('Carregando seu guia de aprendizado...')}
-          </p>
-=======
         <Navbar variant="home" userId={userId} />
         <div className="loading-container">
           <div className="loading-circle" />
           <p>Carregando seu guia de aprendizado...</p>
->>>>>>> c2a2f3428d35862fe6949576390fe6637e4d80ea
         </div>
       </div>
     );
@@ -434,12 +425,6 @@ export const TelaInicial = () => {
   const currentRoadmapItem = roadmap && Array.isArray(roadmap) && roadmap.length > 0 ? roadmap[currentItemIndex] : null;
 
   return (
-<<<<<<< HEAD
-    <div className="home-container">
-      <div className="main-content">
-        <h1>{t('Bem-vindo')}</h1>
-        <h2>{t('Olá, {user}! Seja bem-vindo ao Seu Guia de Aprendizado')}</h2>
-=======
     <>
       <Navbar variant="home" />
       <div className="home-container">
@@ -448,262 +433,28 @@ export const TelaInicial = () => {
           <h2>
             Olá, <span className="user-name">{user || "Usuário"}</span>! Seja bem-vindo ao Seu Guia de Aprendizado
           </h2>
->>>>>>> c2a2f3428d35862fe6949576390fe6637e4d80ea
 
-        {error && (
-          <div className="error-container">
-            <p className="error-message">{error}</p>
-            <div className="error-actions">
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={<Refresh />}
-                onClick={handleRetry}
-                disabled={retryCount >= 3}
-              >
-                {t('Tentar Novamente')}
-              </Button>
-              <Button
-                variant="outlined"
-                color="secondary"
-                onClick={() => navigate("/login")}
-              >
-                {t('Voltar ao Login')}
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {!error && (
-          <div className="card">
-            <h2>{t('Visão Geral do Roadmap')}</h2>
-
-            <div className="progress-container">
-              <div className="progress-bar" style={{ width: `${calculateProgress}%` }}>
-                <span className="progress-text">{Math.round(calculateProgress)}%</span>
-              </div>
-            </div>
-
-            {roadmap && roadmap.length > 0 ? (
-              <div className="roadmap-section">
-                <div className="pagination-controls">
-                  <button
-                    className="pagination-button"
-                    onClick={goToPreviousTopic}
-                    disabled={currentItemIndex === 0}
-                  >
-                    <NavigateBefore /> {t('Anterior')}
-                  </button>
-                  <div className="module-counter">
-                    {currentItemIndex + 1} / {roadmap.length}
-                  </div>
-                  <button
-                    className="pagination-button"
-                    onClick={goToNextTopic}
-                    disabled={currentItemIndex === roadmap.length - 1}
-                  >
-                    {t('Próximo')} <NavigateNext />
-                  </button>
-                </div>
-
-                <div className={`roadmap-content ${isTransitioning ? "transitioning" : ""}`}>
-                  {currentRoadmapItem && (
-                    <div className="roadmap-item">
-                      <div className="roadmap-header">
-                        <h3>
-                          {currentRoadmapItem.ordem}. {currentRoadmapItem.titulo}
-                        </h3>
-                        <div className="roadmap-actions">
-                          <IconButton
-                            onClick={() => toggleFavorite(currentRoadmapItem.ordem)}
-                            color={favorites.includes(currentRoadmapItem.ordem) ? "primary" : "default"}
-                            aria-label={favorites.includes(currentRoadmapItem.ordem) ? "Remover dos favoritos" : "Adicionar aos favoritos"}
-                          >
-                            {favorites.includes(currentRoadmapItem.ordem) ? <Star /> : <StarBorder />}
-                          </IconButton>
-                          <IconButton
-                            onClick={() => toggleNotification(currentRoadmapItem.ordem)}
-                            color={notifications.includes(currentRoadmapItem.ordem) ? "primary" : "default"}
-                            aria-label={notifications.includes(currentRoadmapItem.ordem) ? "Desativar notificações" : "Ativar notificações"}
-                          >
-                            {notifications.includes(currentRoadmapItem.ordem) ? (
-                              <Notifications />
-                            ) : (
-                              <NotificationsOff />
-                            )}
-                          </IconButton>
-                          <IconButton onClick={saveProgress} color="primary" aria-label="Salvar progresso">
-                            <Save />
-                          </IconButton>
-                        </div>
-                      </div>
-
-                      <div className="content-grid">
-                        <div className="main-column">
-                          {currentRoadmapItem.nivelDificuldade && (
-                            <div className="section">
-                              <h4>{t('Nível de Dificuldade')}</h4>
-                              <p>{currentRoadmapItem.nivelDificuldade}</p>
-                            </div>
-                          )}
-
-                          {currentRoadmapItem.tempoEstimadoTotal && (
-                            <div className="section">
-                              <h4>{t('Tempo Estimado Total')}</h4>
-                              <p>{currentRoadmapItem.tempoEstimadoTotal} horas</p>
-                            </div>
-                          )}
-
-                          {currentRoadmapItem.submodulos?.length > 0 && (
-                            <div className="section">
-                              <h4>{t('Submódulos')}</h4>
-                              <div className="section-progress">
-                                <div className="section-progress-bar">
-                                  <div
-                                    className="section-progress-fill"
-                                    style={{
-                                      width: `${calculateSectionProgress(currentRoadmapItem)}%`,
-                                    }}
-                                  />
-                                </div>
-                                <span>{Math.round(calculateSectionProgress(currentRoadmapItem))}%</span>
-                              </div>
-                              <div className="submodules-list">
-                                {currentRoadmapItem.submodulos.map((sub, subIndex) => {
-                                  const key = `${currentItemIndex}-${subIndex}`;
-                                  return (
-                                    <Accordion
-                                      key={subIndex}
-                                      expanded={expandedAccordion === `panel-${subIndex}`}
-                                      onChange={handleAccordionChange(`panel-${subIndex}`)}
-                                    >
-                                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                                        <label style={{ display: "flex", alignItems: "center" }}>
-                                          <input
-                                            type="checkbox"
-                                            checked={!!completedSubmodules[key]}
-                                            onChange={() => handleSubmoduleToggle(currentItemIndex, subIndex)}
-                                            onClick={(e) => e.stopPropagation()} // Evita que o clique no checkbox expanda o accordion
-                                          />
-                                          <Typography
-                                            className={completedSubmodules[key] ? "completed" : ""}
-                                            style={{ marginLeft: "8px" }}
-                                          >
-                                            {sub.nome}
-                                          </Typography>
-                                        </label>
-                                      </AccordionSummary>
-                                      <AccordionDetails>
-                                        {sub.recursos && sub.recursos.length > 0 ? (
-                                          <ul>
-                                            {sub.recursos.map((recurso, idx) => (
-                                              <li key={idx}>
-                                                {recurso.tipo}: {recurso.nome}{" "}
-                                                {recurso.link && (
-                                                  <a
-                                                    href={recurso.link}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="material-link"
-                                                  >
-                                                    [Acessar]
-                                                  </a>
-                                                )}
-                                              </li>
-                                            ))}
-                                          </ul>
-                                        ) : (
-                                          <Typography>{t('Nenhum recurso disponível.')}</Typography>
-                                        )}
-                                      </AccordionDetails>
-                                    </Accordion>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          )}
-
-                          {currentRoadmapItem.cronograma?.length > 0 && (
-                            <div className="section">
-                              <h4>{t('Cronograma')}</h4>
-                              <ul>
-                                {currentRoadmapItem.cronograma.map((sessao, idx) => (
-                                  <li key={idx}>
-                                    {t('Dia: {dia}, {horarioInicio} - {horarioFim} ({cargaHoraria}h)')}
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="side-column">
-                          {currentRoadmapItem.metodosEstudo?.length > 0 && (
-                            <div className="section">
-                              <h4>{t('Métodos de Estudo')}</h4>
-                              <ul>
-                                {currentRoadmapItem.metodosEstudo.map((metodo, idx) => (
-                                  <li key={idx}>{metodo}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-
-                          {currentRoadmapItem.materiaisApoio?.length > 0 && (
-                            <div className="section">
-                              <h4>{t('Materiais de Apoio')}</h4>
-                              <ul>
-                                {currentRoadmapItem.materiaisApoio.map((material, idx) => (
-                                  <li key={idx}>
-                                    {material.tipo}: {material.nome}
-                                    {material.link && (
-                                      <a
-                                        href={material.link}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="material-link"
-                                      >
-                                        [Acessar]
-                                      </a>
-                                    )}
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-
-                          {currentRoadmapItem.dicasAdicionais?.length > 0 && (
-                            <div className="section">
-                              <h4>{t('Dicas Adicionais')}</h4>
-                              <ul>
-                                {currentRoadmapItem.dicasAdicionais.map((dica, idx) => (
-                                  <li key={idx}>{dica}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <div className="no-roadmap">
-                <p>{t('Nenhum roadmap disponível.')}</p>
+          {error && (
+            <div className="error-container">
+              <p className="error-message">{error}</p>
+              <div className="error-actions">
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={() => navigate("/create-roadmap", { state: { userId } })}
+                  startIcon={<Refresh />}
+                  onClick={handleRetry}
+                  disabled={retryCount >= 3}
                 >
-                  {t('Criar Novo Roadmap')}
+                  Tentar Novamente
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={() => navigate("/login")}
+                >
+                  Voltar ao Login
                 </Button>
               </div>
-<<<<<<< HEAD
-            )}
-          </div>
-        )}
-=======
             </div>
           )}
 
@@ -995,7 +746,6 @@ export const TelaInicial = () => {
             </div>
           )}
         </div>
->>>>>>> c2a2f3428d35862fe6949576390fe6637e4d80ea
       </div>
 
       <Snackbar
@@ -1012,7 +762,7 @@ export const TelaInicial = () => {
           {notificationMessage}
         </Alert>
       </Snackbar>
-    </div>
+    </>
   );
 };
 

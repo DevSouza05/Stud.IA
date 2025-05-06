@@ -1,12 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles/global.css";
 import arrow from "../../assets/arrow.svg";
 import { Navbar } from "../../components/Navbar/index.tsx";
-import { useTranslation } from 'react-i18next';
 
 export function Cadastro() {
-  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -85,48 +83,48 @@ export function Cadastro() {
       <Navbar />
       <header>
         <img src={"./logoStudIA.png"} alt="Logo Stud.Ia" />
-        <span>{t('createAccount')}</span>
+        <span>Crie sua conta no Stud.IA</span>
       </header>
 
       <form onSubmit={handleSubmit}>
         <div className="inputContainer">
-          <label htmlFor="name">{t('name')}</label>
+          <label htmlFor="name">Nome</label>
           <input
             type="text"
             name="name"
             id="name"
-            placeholder={t('placeholderName')}
+            placeholder="Seu nome"
             onChange={handleChange}
             value={formData.name}
           />
         </div>
 
         <div className="inputContainer">
-          <label htmlFor="email">{t('email')}</label>
+          <label htmlFor="email">Email</label>
           <input
             type="email"
             name="email"
             id="email"
-            placeholder={t('placeholderEmail')}
+            placeholder="studia@gmail.com"
             onChange={handleChange}
             value={formData.email}
           />
         </div>
 
         <div className="inputContainer">
-          <label htmlFor="senha">{t('password')}</label>
+          <label htmlFor="senha">Senha</label>
           <input
             type="password"
             name="senha"
             id="senha"
-            placeholder={t('placeholderPassword')}
+            placeholder="********"
             onChange={handleChange}
             value={formData.senha}
           />
         </div>
 
         <button className="button" type="submit">
-          {t('register')} <img src={arrow} alt="Seta" />
+          Cadastrar <img src={arrow} alt="Seta" />
         </button>
 
        
@@ -137,8 +135,8 @@ export function Cadastro() {
         )}
 
         <div className="footer">
-          <p>{t('alreadyHaveAccount')}</p>
-          <Link to="/login">{t('login')}</Link>
+          <p>Já tem uma conta?</p>
+          <Link to="/login">Fazer login</Link>
         </div>
       </form>
     </div>

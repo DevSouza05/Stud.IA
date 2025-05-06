@@ -3,10 +3,8 @@ import arrow from "../../assets/arrow.svg";
 import { Navbar } from "../../components/Navbar/index.tsx";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { useTranslation } from 'react-i18next';
 
 export function App() {
-  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     email: "",
     senha: "",
@@ -98,12 +96,12 @@ export function App() {
       <Navbar />
       <header>
         <img src={"./logoStudIA.png"} alt="Logo Stud.Ia" />
-        <span>{t('realize_seu_login')}</span>
+        <span>Realize seu login</span>
       </header>
 
       <form onSubmit={handleSubmit}>
         <div className="inputContainer">
-          <label htmlFor="email">{t('email')}</label>
+          <label htmlFor="email">Email</label>
           <input
             type="email"
             name="email"
@@ -116,7 +114,7 @@ export function App() {
         </div>
 
         <div className="inputContainer">
-          <label htmlFor="senha">{t('senha')}</label>
+          <label htmlFor="senha">Senha</label>
           <input
             type="password"
             name="senha"
@@ -128,10 +126,10 @@ export function App() {
           />
         </div>
 
-        <a href="#">{t('esqueceu_sua_senha')}</a>
+        <a href="#">Esqueceu sua senha?</a>
 
         <button className="button" disabled={loading}>
-          {loading ? "Carregando..." : t('entrar')}
+          {loading ? "Carregando..." : "Entrar"}
           {!loading && <img src={arrow} alt="Seta" />}
         </button>
 
@@ -143,8 +141,8 @@ export function App() {
         )}
 
         <div className="footer">
-          <p>{t('ainda_nao_tem_uma_conta')}</p>
-          <Link to="/cadastro">{t('criar_uma_conta')}</Link>
+          <p>Ainda não tem uma conta?</p>
+          <Link to="/cadastro">Criar uma conta</Link>
         </div>
       </form>
     </div>
