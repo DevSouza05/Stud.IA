@@ -166,7 +166,7 @@ public class roadmapController {
             @Valid @RequestBody ModulosDTO completionDTO
     ) {
         try {
-            logger.info("Recebida requisição para marcar módulo como concluído para userID: {}, moduleId: {}", userId, completionDTO.moduleId());
+            logger.info("Corpo da requisição recebido para userID {}: {}", userId, completionDTO);
 
             Optional<Users> optionalUser = Optional.ofNullable(userService.getUserById(userId));
             if (optionalUser.isEmpty()) {
