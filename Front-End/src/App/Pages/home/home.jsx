@@ -192,9 +192,7 @@ export const TelaInicial = () => {
       setRoadmap(Array.isArray(roadmapResponse.data) ? roadmapResponse.data : []);
       setRetryCount(0);
     } catch (error) {
-      setError(
-        `Não foi possível carregar o roadmap: ${error.response?.data?.message || error.message}. Clique em "Tentar Novamente" ou retorne ao login.`
-      );
+     
       console.error("Erro ao buscar roadmap:", error);
     } finally {
       setLoadingRoadmap(false);
