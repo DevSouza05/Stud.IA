@@ -16,51 +16,59 @@ import "../styles/dashboard.css";
 import { Navbar } from "../../components/Navbar/index.tsx";
 
 const Dashboard = ({ etapas = [] }) => {
-  const numeroDeDiasNoMes = 31;
+  const hoje = new Date();
+  const mesAtual = hoje.getMonth(); // 0 a 11
+  const anoAtual = hoje.getFullYear();
+  const diasNoMes = new Date(anoAtual, mesAtual + 1, 0).getDate();
+  const nomeMes = hoje.toLocaleString("default", { month: "long" });
+
   const [concluidos, setConcluidos] = useState(() => {
     const saved = localStorage.getItem("completedSubmodules");
     return saved ? JSON.parse(saved) : new Array(etapas.length).fill(false);
   });
 
   const [diasEstudo, setDiasEstudo] = useState(() => {
-    const saved = localStorage.getItem("diasEstudo");
-    return saved ? JSON.parse(saved) : Array(numeroDeDiasNoMes).fill(false);
+    const key = `diasEstudo_${anoAtual}-${mesAtual + 1}`;
+    const saved = localStorage.getItem(key);
+    return saved ? JSON.parse(saved) : new Array(diasNoMes).fill(false);
+  });
+
+  const [historicoProgresso, setHistoricoProgresso] = useState(() => {
+    const saved = localStorage.getItem("historicoProgresso");
+    return saved ? JSON.parse(saved) : [];
   });
 
   const [sequenciaAtual, setSequenciaAtual] = useState(0);
   const [maiorSequencia, setMaiorSequencia] = useState(0);
 
-  // Novo estado para armazenar o histórico de progresso
-  const [historicoProgresso, setHistoricoProgresso] = useState(() => {
-    const saved = localStorage.getItem("historicoProgresso");
-    return saved ? JSON.parse(saved) : [];
-  });
+  // Marca o dia de login como estudado
+  useEffect(() => {
+    const diaHoje = hoje.getDate() - 1;
+    const diasAtualizados = [...diasEstudo];
+    diasAtualizados[diaHoje] = true;
+    setDiasEstudo(diasAtualizados);
+
+    const key = `diasEstudo_${anoAtual}-${mesAtual + 1}`;
+    localStorage.setItem(key, JSON.stringify(diasAtualizados));
+  }, []);
 
   useEffect(() => {
     localStorage.setItem("completedSubmodules", JSON.stringify(concluidos));
   }, [concluidos]);
 
   useEffect(() => {
-    localStorage.setItem("diasEstudo", JSON.stringify(diasEstudo));
     calcularSequencias();
-  }, [diasEstudo]);
 
-  useEffect(() => {
-    // Salvar histórico quando houver mudança nos dias de estudo
     const progresso = calcularProgressoDiario();
     if (progresso) {
+      const hojeStr = new Date().toLocaleDateString();
       const novoHistorico = [...historicoProgresso];
-      const hoje = new Date().toLocaleDateString();
-      
-      // Atualiza ou adiciona o progresso de hoje
-      const indexHoje = novoHistorico.findIndex(item => item.data === hoje);
-      if (indexHoje >= 0) {
-        novoHistorico[indexHoje].progresso = progresso;
+      const index = novoHistorico.findIndex((e) => e.data === hojeStr);
+      if (index >= 0) {
+        novoHistorico[index].progresso = progresso;
       } else {
-        novoHistorico.push({ data: hoje, progresso });
+        novoHistorico.push({ data: hojeStr, progresso });
       }
-
-      // Mantém apenas os últimos 7 dias
       const historicoCortado = novoHistorico.slice(-7);
       setHistoricoProgresso(historicoCortado);
       localStorage.setItem("historicoProgresso", JSON.stringify(historicoCortado));
@@ -68,59 +76,41 @@ const Dashboard = ({ etapas = [] }) => {
   }, [diasEstudo]);
 
   const calcularSequencias = () => {
-    let sequenciaAtual = 0;
-    let maiorSequencia = 0;
-    let sequenciaTemp = 0;
+    let atual = 0;
+    let maior = 0;
+    let temp = 0;
 
     diasEstudo.forEach((dia) => {
       if (dia) {
-        sequenciaTemp++;
-        if (sequenciaTemp > maiorSequencia) {
-          maiorSequencia = sequenciaTemp;
-        }
+        temp++;
+        if (temp > maior) maior = temp;
       } else {
-        sequenciaTemp = 0;
+        temp = 0;
       }
     });
 
-    // Verifica se a sequência atual continua até hoje
     for (let i = diasEstudo.length - 1; i >= 0; i--) {
-      if (diasEstudo[i]) {
-        sequenciaAtual++;
-      } else {
-        break;
-      }
+      if (diasEstudo[i]) atual++;
+      else break;
     }
 
-    setSequenciaAtual(sequenciaAtual);
-    setMaiorSequencia(maiorSequencia);
+    setSequenciaAtual(atual);
+    setMaiorSequencia(maior);
   };
 
-  const marcarDiaEstudo = (index) => {
-    const novoDias = [...diasEstudo];
-    novoDias[index] = !novoDias[index];
-    setDiasEstudo(novoDias);
-  };
-
-  const progressoDias = numeroDeDiasNoMes > 0
-    ? Number(((diasEstudo.filter(Boolean).length / numeroDeDiasNoMes) * 100).toFixed(1))
-    : 0;
+  const progressoDias =
+    diasEstudo.length > 0
+      ? Number(((diasEstudo.filter(Boolean).length / diasEstudo.length) * 100).toFixed(1))
+      : 0;
 
   const progressoFinal = Math.min(100, progressoDias);
   const progressoRestante = Number((100 - progressoFinal).toFixed(1));
   const diasEstudadosInteiros = diasEstudo.filter(Boolean).length;
 
-  // Dados para o gráfico de pizza
   const dataPie = [
-    { name: "Dias Estudados", value: Number(progressoDias.toFixed(1)) },
-    { name: "Restante", value: Number(progressoRestante.toFixed(1)) },
+    { name: "Dias Estudados", value: progressoFinal },
+    { name: "Restante", value: progressoRestante },
   ];
-
-  // Dados para o gráfico de linha (últimos 7 dias)
-  const ultimos7Dias = diasEstudo.slice(-7).map((dia, index) => ({
-    dia: `Dia ${index + 1}`,
-    estudou: dia ? 1 : 0,
-  }));
 
   const COLORS = ["#4facfe", "#2d3748"];
 
@@ -130,13 +120,12 @@ const Dashboard = ({ etapas = [] }) => {
     return Number(((diasConcluidos / totalDias) * 100).toFixed(1));
   };
 
-  // Formata os dados para o gráfico de linha
-  const dadosGrafico = historicoProgresso.map(item => ({
-    dia: new Date(item.data).toLocaleDateString('pt-BR', { 
-      day: '2-digit',
-      month: '2-digit'
+  const dadosGrafico = historicoProgresso.map((item) => ({
+    dia: new Date(item.data).toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
     }),
-    progresso: item.progresso
+    progresso: item.progresso,
   }));
 
   return (
@@ -161,12 +150,7 @@ const Dashboard = ({ etapas = [] }) => {
         </div>
 
         <div className="progresso-bar">
-          <div
-            className="progresso"
-            style={{
-              width: `${progressoFinal}%`,
-            }}
-          />
+          <div className="progresso" style={{ width: `${progressoFinal}%` }} />
         </div>
         <p>{progressoFinal}% do mês concluído</p>
 
@@ -180,7 +164,6 @@ const Dashboard = ({ etapas = [] }) => {
                 cx="50%"
                 cy="50%"
                 outerRadius={100}
-                fill="#8884d8"
                 label
               >
                 {dataPie.map((entry, index) => (
@@ -201,44 +184,43 @@ const Dashboard = ({ etapas = [] }) => {
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={dadosGrafico}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-              <XAxis 
-                dataKey="dia" 
+              <XAxis
+                dataKey="dia"
                 stroke="rgba(255,255,255,0.7)"
-                tick={{ fill: 'rgba(255,255,255,0.7)' }}
+                tick={{ fill: "rgba(255,255,255,0.7)" }}
               />
-              <YAxis 
+              <YAxis
                 stroke="rgba(255,255,255,0.7)"
-                tick={{ fill: 'rgba(255,255,255,0.7)' }}
+                tick={{ fill: "rgba(255,255,255,0.7)" }}
                 domain={[0, 100]}
                 unit="%"
               />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: 'rgba(13, 17, 23, 0.9)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: '8px'
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "rgba(13, 17, 23, 0.9)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  borderRadius: "8px",
                 }}
-                labelStyle={{ color: 'rgba(255,255,255,0.9)' }}
+                labelStyle={{ color: "rgba(255,255,255,0.9)" }}
               />
               <Line
                 type="monotone"
                 dataKey="progresso"
                 stroke="#4facfe"
                 strokeWidth={2}
-                dot={{ fill: '#4facfe' }}
+                dot={{ fill: "#4facfe" }}
                 name="Progresso"
               />
             </LineChart>
           </ResponsiveContainer>
         </div>
 
-        <h3>Calendário de Estudos</h3>
+        <h3>Calendário de Estudos - {nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1)}</h3>
         <div className="calendario">
           {diasEstudo.map((dia, index) => (
             <div
               key={index}
               className={`dia ${dia ? "estudado" : ""}`}
-              onClick={() => marcarDiaEstudo(index)}
             >
               <span className="dia-numero">{index + 1}</span>
             </div>
@@ -247,10 +229,10 @@ const Dashboard = ({ etapas = [] }) => {
 
         <div className="info-container">
           <div className="info-card">
-            <p>Dias Restantes: {numeroDeDiasNoMes - diasEstudadosInteiros}</p>
+            <p>Dias Restantes: {diasNoMes - diasEstudadosInteiros}</p>
           </div>
           <div className="info-card">
-            <p>Meta Mensal: {numeroDeDiasNoMes} dias</p>
+            <p>Meta Mensal: {diasNoMes} dias</p>
           </div>
         </div>
       </div>
