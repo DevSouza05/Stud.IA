@@ -1,4 +1,4 @@
-package unisanta.br.StudIA;
+package unisanta.br.studia;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
