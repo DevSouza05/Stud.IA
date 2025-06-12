@@ -1,6 +1,6 @@
 // src/components/Navbar/index.tsx
 import { Link } from "react-router-dom";
-// import "../../Pages/styles/Navbar.css";
+import "../../Pages/styles/Navbar.css";
 import React, { useState, useEffect } from "react";
 import DrawerMenu from "../Drawer/drawer";
 
