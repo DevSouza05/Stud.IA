@@ -22,6 +22,9 @@ const Dashboard = ({ etapas = [] }) => {
   const diasNoMes = new Date(anoAtual, mesAtual + 1, 0).getDate();
   const nomeMes = hoje.toLocaleString("default", { month: "long" });
 
+ 
+
+
   const [concluidos, setConcluidos] = useState(() => {
     const saved = localStorage.getItem("completedSubmodules");
     return saved ? JSON.parse(saved) : new Array(etapas.length).fill(false);

@@ -31,3 +31,23 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+
+# Logs
+*.log
+spring.log
+
+
+# Docker
+*.env
+docker-compose.override.yml
+
+# Testes
+test-output/
+surefire-reports/
+

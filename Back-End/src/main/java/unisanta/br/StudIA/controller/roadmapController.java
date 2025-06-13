@@ -140,7 +140,7 @@ public class roadmapController {
                             throw new IllegalStateException("API retornou um erro: " + response);
                         }
 
-                        String jsonString = extractJson(response);
+                        String jsonString = extraiJson(response);
                         Object parsedResponse = JSON.parseArray(jsonString);
                         if (parsedResponse == null) {
                             throw new IllegalStateException("JSON parseado resultou em null: " + jsonString);
@@ -198,8 +198,8 @@ public class roadmapController {
         }
     }
 
-    @GetMapping("/roadmap/history/{userId}")
-    public ResponseEntity<?> getCompletionHistory(@PathVariable Long userId) {
+    @GetMapping("/roadmap/historico/{userId}")
+    public ResponseEntity<?> getHistoricoCompleto(@PathVariable Long userId) {
         try {
             logger.info("Recebida requisição para obter histórico de conclusões para userID: {}", userId);
 
@@ -222,7 +222,7 @@ public class roadmapController {
         }
     }
 
-    private String extractJson(String response) {
+    private String extraiJson(String response) {
         Pattern jsonPattern = Pattern.compile("(?s)```json\\n(.*?)\\n```");
         Matcher matcher = jsonPattern.matcher(response);
         if (matcher.find()) {

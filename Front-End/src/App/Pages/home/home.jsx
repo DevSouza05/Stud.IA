@@ -91,7 +91,7 @@ export const TelaInicial = () => {
   // Função para buscar o histórico de conclusão
   const fetchHistory = async () => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/v1/roadmap/history/${userId}`, {
+      const response = await axios.get(`http://localhost:8080/api/v1/roadmap/historico/${userId}`, {
         timeout: 10000,
       });
       setHistory(response.data || []);
@@ -300,23 +300,6 @@ export const TelaInicial = () => {
         const score = Number(module.pontuacao) || 0;
         return acc + score;
       }, 0);
-  
-      // Corpo da requisição para marcar o curso como concluído
-      const requestBody = {
-        moduleId: 9999,
-        title: "Curso Completo",
-        completionDate: new Date().toISOString().split('T')[0], // Formato YYYY-MM-DD
-        score: Math.round(totalScore), // Garante que seja um inteiro
-      };
-  
-      console.log("Enviando requisição para completar curso:", requestBody);
-  
-      // Enviar requisição para o backend
-      const response = await axios.post(
-        `http://localhost:8080/api/v1/roadmap/complete/${userId}`,
-        requestBody,
-        { timeout: 10000 }
-      );
   
       // Atualiza o histórico imediatamente
       await fetchHistory();
