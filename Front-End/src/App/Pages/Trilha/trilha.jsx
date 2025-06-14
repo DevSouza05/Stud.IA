@@ -14,7 +14,7 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import "../styles/TrilhaPage.css";
 import { Navbar } from "../../components/Navbar/index.tsx";
 
-axios.defaults.baseURL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+axios.defaults.baseURL = import.meta.env.VITE_API_URL || "https://stud-ia.onrender.com";
 
 const TreeNode = ({ node, progress, handleCheckboxChange, level = 0 }) => {
   const [isOpen, setIsOpen] = useState(false);
