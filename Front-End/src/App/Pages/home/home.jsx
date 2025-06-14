@@ -91,7 +91,7 @@ export const TelaInicial = () => {
   // Função para buscar o histórico de conclusão
   const fetchHistory = async () => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/v1/roadmap/historico/${userId}`, {
+      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/roadmap/historico/${userId}`, {
         timeout: 10000,
       });
       setHistory(response.data || []);
@@ -174,7 +174,7 @@ export const TelaInicial = () => {
     }
 
     try {
-      const userResponse = await axios.get(`http://localhost:8080/api/v1/auth/${parsedUserId}`, {
+      const userResponse = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/${parsedUserId}`, {
         timeout: 10000,
       });
       setUser(userResponse.data?.user?.username || "Usuário");
@@ -186,7 +186,7 @@ export const TelaInicial = () => {
     }
 
     try {
-      const roadmapResponse = await axios.get(`http://localhost:8080/api/v1/roadmap/${parsedUserId}`, {
+      const roadmapResponse = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/roadmap/${parsedUserId}`, {
         timeout: 50000,
       });
       setRoadmap(Array.isArray(roadmapResponse.data) ? roadmapResponse.data : []);
@@ -241,7 +241,7 @@ export const TelaInicial = () => {
       console.log("Enviando requisição para completar módulo:", requestBody);
   
       const response = await axios.post(
-        `http://localhost:8080/api/v1/roadmap/complete/${userId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/roadmap/complete/${userId}`,
         requestBody,
         { timeout: 10000 }
       );

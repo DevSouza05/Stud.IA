@@ -237,7 +237,7 @@ export function SwiperPage() {
 
       const minLoadingTime = new Promise((resolve) => setTimeout(resolve, 250));
 
-      const fetchPromise = fetch("http://localhost:8080/api/v1/roadmap", {
+      const fetchPromise = fetch(`${import.meta.env.VITE_API_BASE_URL}/api/v1/roadmap`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
