@@ -17,6 +17,7 @@ unisanta\br\StudIA\controller\ChatController.class
 unisanta\br\StudIA\service\ModulosService.class
 unisanta\br\StudIA\repository\ModulosRepository.class
 unisanta\br\StudIA\service\SelecaoService.class
+unisanta\br\StudIA\WebConfig.class
 unisanta\br\StudIA\Model\Trilha.class
 unisanta\br\StudIA\service\TrilhaService.class
 unisanta\br\StudIA\dto\ChatBotDTO.class
