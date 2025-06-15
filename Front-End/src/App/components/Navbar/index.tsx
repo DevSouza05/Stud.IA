@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import "../../Pages/styles/Navbar.css";
+import "../../Pages/styles/navbar.css";
 import React, { useState, useEffect } from "react";
 import { GiHamburgerMenu } from "react-icons/gi"; 
 import DrawerMenu from "../Drawer/drawer";
