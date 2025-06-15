@@ -1,3 +1,4 @@
+/* Estrutura do container */
 .intro-container {
     display: flex;
     justify-content: center;
@@ -9,6 +10,7 @@
     padding: 40px;
     position: relative;
     overflow: hidden;
+    margin-top: 80px; 
 }
 
 /* Elementos decorativos de fundo */
@@ -44,6 +46,7 @@
     animation: slideIn 1s ease-out;
     letter-spacing: -1px;
 }
+
 
 .intro-content h2 {
     font-size: 1.5rem;
@@ -86,6 +89,7 @@
     transform: translateY(1px);
 }
 
+/* Imagem */
 .intro-image {
     flex: 1;
     max-width: 500px;
@@ -134,27 +138,86 @@
 }
 
 /* Responsividade */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
+    /* Ajuste para tablets ou telas médias */
     .intro-container {
-        padding: 20px;
+        padding: 30px;
     }
 
     .intro-content h1 {
-        font-size: 2.5rem;
+        font-size: 3rem;
     }
 
     .intro-content h2 {
-        font-size: 1.5rem;
+        font-size: 1.3rem;
     }
 
     .intro-content h3 {
+        font-size: 1.2rem;
+    }
+
+    .intro-button {
+        padding: 12px 28px;
         font-size: 1.1rem;
-        max-width: 100%;
+    }
+
+    .intro-image {
+        max-width: 400px; 
+    }
+}
+
+@media (max-width: 768px) {
+    /* Ajustes para telas menores */
+    .intro-container {
+        flex-direction: column;
+        padding: 20px;
+        align-items: center;
+        margin-top: 60px;
+    }
+
+    .intro-content h1,
+    .intro-content h2,
+    .intro-content h3 {
+        text-align: center;
     }
 
     .intro-button {
         padding: 12px 25px;
         font-size: 1.1rem;
     }
+
+    .intro-image {
+        max-width: 100%;
+        padding: 10px;
+    }
 }
-  
+
+@media (max-width: 480px) {
+    /* Ajustes para dispositivos móveis */
+    .intro-container {
+        padding: 15px;
+    }
+
+    .intro-content h1 {
+        font-size: 2rem;
+    }
+
+    .intro-content h2 {
+        font-size: 1.2rem;
+    }
+
+    .intro-content h3 {
+        font-size: 1rem;
+    }
+
+    .intro-button {
+        padding: 10px 20px;
+        font-size: 1rem;
+    }
+
+    .intro-image {
+        max-width: 100%;
+        padding: 10px;
+    }
+}
+

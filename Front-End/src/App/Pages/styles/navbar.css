@@ -1,153 +1,137 @@
-/* Navbar - Estilos principais */
+/* Estilos principais */
 .navbar {
-    background: transparent;
-    padding: 0.8rem 1.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100vw;
-    height: 60px;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1000;
+  background: transparent;
+  padding: 0.8rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100vw;
+  height: 60px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
 }
 
 .navbar-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    padding: 0 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0 15px;
 }
 
 .navbar-logo {
-    padding-top: 10px;
+  padding-top: 10px;
 }
 
 .navbar-logo img {
-    height: 50px;
-    width: auto;
+  height: 50px;
+  width: auto;
 }
 
 .navbar-menu {
-    display: flex;
-    list-style: none;
-    gap: 1.2rem;
-    margin-left: auto;
-    align-items: center;
+  display: flex;
+  list-style: none;
+  gap: 1.2rem;
+  margin-left: auto;
+  align-items: center;
 }
 
 .navbar-menu li {
-    list-style: none;
+  list-style: none;
 }
 
 /* Links */
 .navbar-link {
-    color: white;
-    text-decoration: none;
-    font-size: 1rem;
-    font-weight: 500;
-    transition: 0.3s;
+  color: white;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: 0.3s;
 }
 
 .navbar-link:hover {
-    color: #4facfe;
+  color: #4facfe;
 }
 
 /* Botões */
-.navbar-button, .navbar-signup {
-    background: transparent;
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    text-decoration: none;
-    transition: 0.3s;
-    border: 1.5px solid #4facfe;
-    margin-left: 3px;
+.navbar-button,
+.navbar-signup {
+  background: transparent;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: 0.3s;
+  border: 1.5px solid #4facfe;
+  margin-left: 3px;
 }
 
-.navbar-button:hover, .navbar-signup:hover {
-    background: rgba(79, 172, 254, 0.1);
-    transform: translateY(-2px);
+.navbar-button:hover,
+.navbar-signup:hover {
+  background: rgba(79, 172, 254, 0.1);
+  transform: translateY(-2px);
 }
 
-.container {
-    padding-top: 60px; /* Espaço para o navbar fixo */
-}
-
-.navbar.home {
-    background: transparent;
-}
-
-.navbar.home .navbar-logo img {
-    height: 40px;
-    width: auto;
-}
-
-.navbar.home .navbar-menu {
-    margin-right: 1.5rem;
-}
-
-/* Responsividade: Menu hamburguer */
+/* Responsividade: Menu Hamburguer */
 @media (max-width: 768px) {
-    /* Ajustes para o navbar em telas pequenas */
-    .navbar.home .navbar-menu {
-        display: none;
-        flex-direction: column;
-        position: absolute;
-        top: 60px;
-        right: 0;
-        background: rgba(0, 0, 0, 0.9);
-        width: 100%;
-        text-align: center;
-        padding: 0.8rem 0;
-    }
+  /* o navbar em telas pequenas */
+  .navbar .navbar-menu {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 60px; 
+    right: 0;
+    background: rgba(0, 0, 0, 0.9);
+    width: 100%;
+    text-align: center;
+    padding: 0.8rem 0;
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease;
+    transform: translateY(-100%); 
+    opacity: 0; 
+  }
 
-    /* Menu visível quando 'active' */
-    .navbar.home .navbar-menu.active {
-        display: flex;
-    }
+  /* Menu visível quando 'active' */
+  .navbar .navbar-menu.active {
+    display: flex;
+    transform: translateY(0);
+    opacity: 1;
+  }
 
-    .navbar.home .navbar-menu li {
-        padding: 0.6rem 0;
-    }
+  /* Exibe o ícone de hambúrguer em telas pequenas */
+  .navbar-home-hamburger {
+    display: block;
+    cursor: pointer;
+  }
 
-    /* Exibe o ícone de hamburguer apenas em telas pequenas */
-    .navbar-home-hamburger {
-        display: block;
-        cursor: pointer;
-    }
+  .navbar-home-hamburger svg {
+    width: 30px;
+    height: 30px;
+    color: white;
+  }
 
-    .navbar-home-hamburger img {
-        width: 25px;
-        height: auto;
-    }
+  .navbar-menu {
+    gap: 0.8rem;
+  }
 
-    /* Ajustar a altura do logo para telas pequenas */
-    .navbar-logo img {
-        height: 40px;
-    }
+  .navbar-link {
+    font-size: 1rem;
+  }
 
-    .navbar-menu {
-        gap: 0.8rem;
-    }
-    
-    .navbar-link {
-        font-size: 0.95rem;
-    }
-    
-    .navbar-button, .navbar-signup {
-        padding: 0.4rem 1.2rem;
-        font-size: 0.9rem;
-    }
+  /* Botões de login e cadastro no menu hambúrguer */
+  .navbar-button,
+  .navbar-signup {
+    padding: 0.4rem 1.2rem;
+    font-size: 0.9rem;
+  }
 }
 
 @media (min-width: 769px) {
-    /* Esconde o ícone de hamburguer em telas maiores que 768px */
-    .navbar-home-hamburger {
-        display: none;
-    }
+  /* Esconde o ícone de hambúrguer em telas maiores que 768px */
+  .navbar-home-hamburger {
+    display: none;
+  }
 }

@@ -15,6 +15,7 @@ import { AppProvider } from "./App/context/AppContext.jsx";
 import TrilhaPage from "./App/Pages/Trilha/trilha.jsx";
 import "./App/styles/global.css";
 
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <AppProvider>
